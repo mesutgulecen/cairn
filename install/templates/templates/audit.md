@@ -1,4 +1,4 @@
-# <Area> audit — <YYYY-MM-DD>
+# <Area> audit, <YYYY-MM-DD>
 
 **Scope:** <what is in, what is deliberately out> · **Mode:** read-only ·
 **Previous run:** <path or "first run">
@@ -7,7 +7,7 @@
 
 Every finding carries evidence: a query result, a log line, a command output or a
 `file:line`. A finding without evidence is labelled `UNVERIFIED` and stays in the
-report — dropping it hides the gap; promoting it invents a fact.
+report. Dropping it hides the gap; promoting it invents a fact.
 
 Numbering continues from the previous run. Never renumber: a finding id is how
 two documents six months apart refer to the same thing.
@@ -41,7 +41,7 @@ Report per-arm values separately until every arm has reported.
 - **Evidence:** <the raw thing>
 - **Mechanism:** <why it happens>
 - **Impact:** <quantified, or "unsized" plus the query that would size it>
-- **Recommendation:** <what to change; or "none — accepted risk", with the reason>
+- **Recommendation:** <what to change; or "none, accepted risk", with the reason>
 
 ## Instrumentation gaps
 

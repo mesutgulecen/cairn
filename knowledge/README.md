@@ -3,7 +3,7 @@
 A knowledge base decays silently. Nothing throws when a link breaks, when a note
 becomes unreachable, when a status says `superseded` and points nowhere, or when
 the always-loaded index quietly doubles. The only symptom is a session that fails
-to recall something it was told — which reads as a model limitation rather than
+to recall something it was told, which reads as a model limitation rather than
 as rot.
 
 `knowledge_lint.py` turns all four into build output.
@@ -23,8 +23,8 @@ project's `docs/`. Override with `--index`, `--corpus`, `--entry`, `--root` and
 ## Why this cannot be a CI job
 
 The notes usually live under `$HOME`, outside the repository, so a CI runner sees
-almost none of the graph. Run it from a `SessionStart` hook instead — the shipped
-`session-start.sh` prints its summary block — and let CI check only the parts
+almost none of the graph. Run it from a `SessionStart` hook instead. The shipped
+`session-start.sh` prints its summary block, and let CI check only the parts
 that are committed.
 
 ## The four findings

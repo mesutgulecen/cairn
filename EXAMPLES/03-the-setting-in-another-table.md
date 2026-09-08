@@ -1,4 +1,4 @@
-# 3 — The setting that lived in another table
+# 3. The setting that lived in another table
 
 ## What happened
 
@@ -22,7 +22,7 @@ it being connected.
 The sentence that carried the conclusion was **"13 accounts have no
 restriction"**. That sentence is about behaviour. The query was about a column.
 The gap between them is exactly where the second table lives, and the sentence
-gives the reader nothing to pull on — it reads as settled.
+gives the reader nothing to pull on. It reads as settled.
 
 Had the sentence been **"13 accounts have an empty `accounts.sources`"**, the
 next question asks itself: *is that the only place this setting lives?*
@@ -32,12 +32,12 @@ next question asks itself: *is that the only place this setting lives?*
 The identical asymmetry produced a display bug on three screens at once. Three
 components each parsed the same field to draw an account's configured sources.
 For one kind of account that field holds something else entirely, so all three
-drew the wrong thing — while the *editor*, which used the correct reader, showed
+drew the wrong thing, while the *editor*, which used the correct reader, showed
 the right values. A user could see the correct configuration in the editor and
 the wrong one on the card, in the same session.
 
 And the empty value turned out to have three meanings, not two: *none*, *all
-including ones added later*, and — the one nobody had modelled — *present but no
+including ones added later*, and, the one nobody had modelled, *present but no
 longer meaningful*. A reader that fell back to "everything" when none of the
 stored values survived the current options drew an account pinned to a retired
 option as unrestricted, while the backend treated the same row as an allow-list

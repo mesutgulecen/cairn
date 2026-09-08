@@ -1,5 +1,5 @@
 ---
-description: Fix-of-fix chains — read the prior fix before changing what it established
+description: Fix-of-fix chains: read the prior fix before changing what it established
 paths:
   - "**"   # narrow this to your money path / core logic once installed
 ---
@@ -25,7 +25,7 @@ When your change touches behaviour a previous fix established:
    not only to code paths: a column's freshness is part of its contract. One
    eager-population fix starved a worklist that keyed on the column still being
    empty.
-3. **Write the failing test first — and a second test pinning the prior fix's
+3. **Write the failing test first, and a second test pinning the prior fix's
    scenario.** Name them after the incident so a stale invariant is greppable.
 4. **List what must NOT change.** In the plan or the commit, name at least three
    "shall continue to" neighbours: the other variant, the parallel path, the

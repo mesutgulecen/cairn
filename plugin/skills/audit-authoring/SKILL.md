@@ -1,11 +1,11 @@
 ---
 name: audit-authoring
-description: Write an audit or investigation report whose numbers can be trusted — population and window on every metric, per-arm before aggregate, evidence or an explicit UNVERIFIED label. Use when reporting measurements, writing an audit, or answering "how is X doing" with numbers.
+description: Write an audit or investigation report whose numbers can be trusted: population and window on every metric, per-arm before aggregate, evidence or an explicit UNVERIFIED label. Use when reporting measurements, writing an audit, or answering "how is X doing" with numbers.
 ---
 
 # Authoring an audit
 
-The failure mode of an audit is not being wrong. It is being *plausible* — a
+The failure mode of an audit is not being wrong. It is being *plausible*: a
 number without its population, a mean that describes none of the cases that
 matter, a conclusion drawn from one arm of a system that has several.
 
@@ -24,12 +24,12 @@ notice the baseline itself spanned 3,010–6,116.
 
 When a metric exists per chain, tenant, region, currency or kind, no arm may be
 generalised until every arm has reported. One ratio came back at 1.00 on the arm
-that runs a single batch and 5.94 on the arm that runs 28 — the conclusion drawn
+that runs a single batch and 5.94 on the arm that runs 28. The conclusion drawn
 from the first was exactly backwards for the one that mattered.
 
 And **name the column in the sentence**. "13 rows have an empty
 `accounts.sources`" invites the next question; "13 accounts have no restriction"
-closes it — and hid the second table where the other kind stores that setting.
+closes it, and hid the second table where the other kind stores that setting.
 
 ## Use p50 and p95, never a bare mean
 
@@ -42,7 +42,7 @@ against the case anyone cared about.
 `component = total − everything else` overstates whatever is left. Give each
 stage its own timer and publish `accounted` against `total`; a gap is an
 un-instrumented stage, not noise. Enumerate every stage the work passes through,
-not only the ones your hypothesis names — the dominant consumer is regularly one
+not only the ones your hypothesis names. The dominant consumer is regularly one
 nobody listed.
 
 Before trusting a new timer, calibrate it against a case with a known answer.

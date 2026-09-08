@@ -1,4 +1,4 @@
-# Prompt — server and infrastructure hardening audit
+# Prompt: server and infrastructure hardening audit
 
 | Argument | Default | Meaning |
 |---|---|---|
@@ -7,7 +7,7 @@
 | `output` | `docs/audits/<date>/server-hardening-<date>.md` | report path |
 
 Read-only. Every check compares the **running** state against the baseline
-document; where they differ, the finding names which one is wrong — drift is as
+document; where they differ, the finding names which one is wrong. Drift is as
 often a stale document as a misconfigured host.
 
 ## Checklist
@@ -31,23 +31,23 @@ recorded. Kernel and library versions against known advisories.
 **Backups.** Not "is a backup configured" but **"when was a restore last
 performed"**. An untested backup is a belief. Check retention against the
 retention *policy*, and check that the policy's window exceeds the longest
-plausible detection delay — a backup chain shorter than the time it takes to
+plausible detection delay. A backup chain shorter than the time it takes to
 notice corruption restores the corruption.
 
 **Observability.** Log retention in hours, not adjectives. Know the number: many
 default journal configurations keep hours, which means an incident investigated
 the next morning has no logs. Database counters usually outlive logs by an order
-of magnitude — know which of your evidence sources dies first.
+of magnitude. Know which of your evidence sources dies first.
 
 **Automation traps.** Two that recur:
 
 - A threshold expressed as a **percentage** silently changes meaning when the
   disk is resized. Alert on absolute free space, or re-derive on resize.
 - A retention job that reads access time is disarmed by anything that touches
-  files — including the audit that checks them. Read modification time.
+  files, including the audit that checks them. Read modification time.
 
 ## Output
 
 A table of host × check × `pass` / `drift` / `fail`, then findings. For every
 drift, state whether the host or the baseline document is wrong, and fix the
-document in the same session — a baseline nobody trusts is not a baseline.
+document in the same session. A baseline nobody trusts is not a baseline.

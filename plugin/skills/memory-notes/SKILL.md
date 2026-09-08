@@ -1,6 +1,6 @@
 ---
 name: memory-notes
-description: Write a durable memory note that a future session will actually recall — one fact per file, front matter recall can judge, absolute dates, and an index line. Use when asked to remember something, after learning a non-obvious fact, or when the knowledge linter reports schema or reachability findings.
+description: Write a durable memory note that a future session will actually recall: one fact per file, front matter recall can judge, absolute dates, and an index line. Use when asked to remember something, after learning a non-obvious fact, or when the knowledge linter reports schema or reachability findings.
 ---
 
 # Writing a memory note
@@ -36,14 +36,14 @@ Types: `user` (who the person is), `feedback` (how to work, with the why),
    cold runs, range 8m10s–11m04s" is a fact a future session can act on and
    compare against.
 3. **Do not store what the repository already records.** Code structure, past
-   fixes, git history, project guidelines — all cheaper to read than to remember,
+   fixes, git history and project guidelines are all cheaper to read than to remember,
    and they go stale without any signal. If asked to remember one of those, ask
    what was *non-obvious* about it and store that instead.
 4. **Do not store what only matters to this conversation.**
 
 ## Link liberally, including to notes that do not exist
 
-`[[a-note-not-written-yet]]` is not an error — it marks something worth writing.
+`[[a-note-not-written-yet]]` is not an error. It marks something worth writing.
 The linter reports dangling links without failing on them, precisely so this
 stays cheap. What it *does* fail on is a link that only resolves after
 normalisation (`[[a-note]]` against `a_note.md`): that is drift, and drift
@@ -54,12 +54,12 @@ compounds.
 One line per note in the index, never note content:
 
 ```markdown
-- [Title](file.md) — the hook that makes a future session open it
+- [Title](file.md), the hook that makes a future session open it
 ```
 
 The index is loaded into **every** session, so its size is a fixed per-session
 cost. Over budget, move the oldest lines into a dated archive note that stays
-reachable by a link — reachability is measured by traversal, so an archived note
+reachable by a link. Reachability is measured by traversal, so an archived note
 is still indexed.
 
 ## When superseding

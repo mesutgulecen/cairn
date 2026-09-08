@@ -1,5 +1,5 @@
 ---
-description: The second chain breaks every assumption written for the first — selectors, constants, defaults, payloads
+description: The second chain breaks every assumption written for the first: selectors, constants, defaults, payloads
 paths:
   - "**/worker/**"
   - "**/onchain/**"
@@ -19,10 +19,10 @@ Before editing chain-dispatching code, ask:
 1. **Chain-unscoped selector?** Does a query, repository method or worklist select
    tokens, positions or pools **without a chain filter**, so a row from chain B
    gets processed against chain A's RPC, constants or contracts? Reconciliation,
-   exit monitoring, holder tracking and lifecycle cleanup were all this — every
+   exit monitoring, holder tracking and lifecycle cleanup were all this, every
    one written when the filter would have been a no-op.
-2. **Constant leak?** Is a package-level constant — the wrapped native token, a
-   chain id, the canonical stablecoin — compared by value rather than resolved per
+2. **Constant leak?** Is a package-level constant (the wrapped native token, a
+   chain id, the canonical stablecoin) compared by value rather than resolved per
    chain? A pricing helper that matched chain A's wrapped-native address mispriced
    chain B's pools by roughly **1,780×** and marked the result valid.
 3. **Default branch falls through to chain A?** A `switch chain` whose unknown case
@@ -30,7 +30,7 @@ Before editing chain-dispatching code, ask:
    prefer fail-closed: skip and alert.
 4. **Per-chain enablement missing?** New tagging, enrichment or caching usually
    needs an explicit "enabled for chain B" beside the one it already has. Without
-   it chain B receives empty data and a downstream gate **starves** — no error,
+   it chain B receives empty data and a downstream gate **starves**: no error,
    just a gate that never passes.
 5. **Quote basis fail-unsafe?** A pool whose quote asset is not recognised must
    fail closed. Priced as the familiar quote it produces garbage that is marked
@@ -38,7 +38,7 @@ Before editing chain-dispatching code, ask:
    two you have.
 6. **Payload carries a hash but not the chain?** Any event, notification or API
    response shipping a transaction hash or token address **must** ship the chain
-   too. Otherwise the consumer infers it, and infers the original — producing
+   too. Otherwise the consumer infers it, and infers the original, producing
    links that point confidently at the wrong explorer. This bit one system twice:
    a feed, then the entire notification layer.
 

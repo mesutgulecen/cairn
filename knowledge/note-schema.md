@@ -21,10 +21,10 @@ metadata:
 
 | Type | Holds |
 |---|---|
-| `user` | who the person is — role, expertise, standing preferences |
+| `user` | who the person is: role, expertise, standing preferences |
 | `feedback` | how you should work: corrections and confirmed approaches, **with the why** |
 | `project` | ongoing work, goals, constraints not derivable from the code or git history |
-| `reference` | a durable fact or pointer — a measured number, an external resource, a trap |
+| `reference` | a durable fact or pointer: a measured number, an external resource, a trap |
 
 Convert relative dates to absolute ones. "Last Tuesday" is worthless in three
 months; a note that silently expires is worse than no note.
@@ -32,7 +32,7 @@ months; a note that silently expires is worse than no note.
 ## Linking
 
 Link liberally with `[[name]]`. A link to a note that does not exist yet is
-**not an error** — it marks something worth writing. That is why the linter
+**not an error**. It marks something worth writing. That is why the linter
 reports dangling links but does not fail on them, while it does fail on a link
 that resolves only after normalisation: those are drift, and drift compounds.
 
@@ -50,13 +50,13 @@ that resolves only after normalisation: those are drift, and drift compounds.
 The index file (`MEMORY.md`) is loaded into **every** session, so its byte count
 is a per-session tax. The default budget is 20,000 bytes, roughly 5K tokens. Over
 budget, the oldest lines move into a dated archive hub that stays reachable by a
-link — the linter measures reachability by traversal, so an archived note is
+link. The linter measures reachability by traversal, so an archived note is
 still "indexed", just not resident.
 
 One line per note in the index, never note content:
 
 ```markdown
-- [Title](file.md) — the hook that makes a future session open it
+- [Title](file.md), the hook that makes a future session open it
 ```
 
 ## What the linter enforces

@@ -1,4 +1,4 @@
-# Prompt — post-deploy verification
+# Prompt: post-deploy verification
 
 Run at **T+30min** after a deploy or a flag flip. Its purpose is narrow and
 unglamorous: prove the thing you shipped is *running* and *taking effect*, before
@@ -12,18 +12,18 @@ anyone reasons from the assumption that it is.
 
 ## The three questions, in order
 
-**1 — Is the new code actually running?** Compare the build identifier reported
+**1. Is the new code actually running?** Compare the build identifier reported
 by the running service against the commit you intended to ship. "The pipeline was
 green" is not an answer: a green pipeline that skipped the deploy step is the
 common failure, not the exotic one.
 
-**2 — Does the environment carry the configuration?** Every new key the change
+**2. Does the environment carry the configuration?** Every new key the change
 introduced must exist in the deployed environment with the intended value. A
 feature whose flag was never added lands dormant, looks identical to a bug, and
 is usually found months later by accident.
 
-**3 — Activation proof.** State the single observation that could only be true if
-the change took effect — a log line, a counter, a query result — and go and look
+**3. Activation proof.** State the single observation that could only be true if
+the change took effect: a log line, a counter, a query result. Then go and look
 for it. Rules of evidence:
 
 - **A populated column is not activation proof.** It may have been populated by
@@ -38,7 +38,7 @@ for it. Rules of evidence:
 For the specific metric the change was meant to move: report `p50` **and** the
 range, before and after, over comparable windows. If the baseline was spiky,
 compare against its `[min, max]` and say whether the new reading falls inside it
-— a single value sitting mid-range is *unchanged*, not improved.
+A single value sitting mid-range is *unchanged*, not improved.
 
 A five-minute window can invert a verdict. One fix read as ineffective over five
 minutes and as a 56% improvement over fifty-five.

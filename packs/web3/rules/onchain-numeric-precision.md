@@ -8,8 +8,8 @@ paths:
 
 # On-chain numeric precision
 
-Three separate scales meet in every price calculation — the token's decimals, the
-database's numeric representation, and the language's float — and each one loses
+Three separate scales meet in every price calculation: the token's decimals, the
+database's numeric representation, and the language's float, and each one loses
 money differently.
 
 1. **Decimals are per token, and they are not 18.** Reading a balance with a
@@ -21,7 +21,7 @@ money differently.
    integer by moving its trailing zeros into the exponent, so a supply of exactly
    `1e27` decodes with mantissa `1` while an untidy neighbour decodes with the
    whole value in the mantissa. Reading the mantissa alone is therefore correct
-   for untidy numbers and catastrophically wrong for round ones — which is
+   for untidy numbers and catastrophically wrong for round ones, which is
    precisely why it survives review: it looks intermittent rather than broken.
    In production, every token whose supply was a round power of ten priced at
    roughly zero, and a low-value cleanup rule then deleted 495 of them.

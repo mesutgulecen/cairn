@@ -7,8 +7,8 @@ paths:
 # Unmeasured is not zero
 
 The most-repeated production bug of one month, in one codebase, was a single
-shape: a producer writes a synthetic **0** for something it never measured — the
-window had no events, the pointer was nil, the probe had not run — and a
+shape: a producer writes a synthetic **0** for something it never measured: the
+window had no events, the pointer was nil, the probe had not run, and a
 downstream `value <= threshold` safety check then **fails OPEN** on that fake
 zero as if it were a real reading.
 
@@ -23,20 +23,20 @@ Before touching metric extraction, gate predicates or audit serialisation:
    `measured` flag rather than on the value being present.
 2. **Consumer: does the reader turn NULL back into a sentinel?** A gate must read
    unmeasured as NaN, never as 0. `NaN <= x` and `x < NaN <= y` are both **false**,
-   so the gate fails CLOSED — which is the correct direction for a check that
+   so the gate fails CLOSED, which is the correct direction for a check that
    cannot see its input.
 3. **Key on measured-ness, never on `value == 0`.** A three-state design
    (`value` + `probed`) distinguishes "checked and false" from "never checked". A
    `NOT NULL DEFAULT FALSE` boolean has no such distinction; if the gate must tell
    them apart, add a `checked_at` timestamp.
 4. **Not every zero is a sentinel.** Volume, counts and absolute totals may
-   legitimately treat missing as zero. Scope this rule to the *safety* family —
-   ratios, thresholds, quorum counters — and leave the rest alone. A blanket ban
+   legitimately treat missing as zero. Scope this rule to the *safety* family:
+   ratios, thresholds, quorum counters, and leave the rest alone. A blanket ban
    produces a wall of noise, and a noisy rule is an ignored rule.
 5. **One NaN destroys a whole audit record.** JSON encoders fail **atomically** on
    a non-finite float: a single fail-closed NaN blinds the entire forensic row
    that would have explained the decision. Sanitise non-finite values at the
-   serialisation boundary. Note the chain — fixing rule 2 produces *more* NaNs
+   serialisation boundary. Note the chain: fixing rule 2 produces *more* NaNs
    and therefore widens this surface; the two changes land together.
 6. **Fix it on every parallel path.** If a second implementation mirrors the
    first (see `parallel-paths-parity`), a sentinel fixed on one side is a drift
@@ -50,7 +50,7 @@ mantissa `1`, exponent `27`, while an untidy neighbour decodes with the whole
 value in the mantissa and an exponent of zero.
 
 Reading the mantissa alone is therefore *correct for untidy numbers and
-catastrophically wrong for round ones* — which is exactly why it survives review:
+catastrophically wrong for round ones*, which is exactly why it survives review:
 it looks intermittent rather than broken. In production every token whose supply
 was exactly `1e27` priced at roughly zero, and a low-value cleanup rule then
 deleted 495 of them.

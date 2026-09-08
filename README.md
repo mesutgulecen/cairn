@@ -4,7 +4,7 @@
 lost.* This is the same idea for engineering with Claude Code.
 
 Most repositories in this space distribute **content**: agent collections, prompt
-megapacks, command libraries. Cairn distributes **process** — the handful of
+megapacks, command libraries. Cairn distributes **process**: the handful of
 mechanisms that decided, across two production codebases, whether an AI-assisted
 change was correct or merely plausible.
 
@@ -55,11 +55,11 @@ match anything at all. The plan gate had a check that was dead from the day
 
 | | |
 |---|---|
-| **6 rules** | injected at edit time by path. Each opens with the measurement that produced it — a window, a ratio, a count — because a rule that says "measure carefully" is advice, and one that says "1.49x over 25 minutes was 1.043x over 9.32 hours" changes behaviour. |
+| **6 rules** | injected at edit time by path. Each opens with the measurement that produced it, a window or a ratio or a count, because a rule that says "measure carefully" is advice, and one that says "1.49x over 25 minutes was 1.043x over 9.32 hours" changes behaviour. |
 | **5 hooks** | three that block (plan discipline, edit-time compile, migration invariants) and two that advise (session continuity, config drift). |
-| **3 skills** | `plan-authoring`, `audit-authoring`, `memory-notes` — the judgement behind the three things this repo asks you to write. Frontend/motion skills are deliberately not vendored; the README points upstream instead. |
+| **3 skills** | `plan-authoring`, `audit-authoring`, `memory-notes`: the judgement behind the three things this repo asks you to write. Frontend/motion skills are deliberately not vendored; the README points upstream instead. |
 | **7 commands** | `/plan-new` `/plan-gate` `/kb-lint` `/deploy-verify` `/incident` `/regression-sweep` `/code-review` |
-| **A knowledge linter** | four silent decay modes — link drift, unreachable notes, schema drift, an index over its per-session token budget — turned into build output. |
+| **A knowledge linter** | four silent decay modes (link drift, unreachable notes, schema drift, an index over its per-session token budget) turned into build output. |
 | **Templates** | plan (tiered, with the discipline gates as sections), incident, audit, and a commit convention. Plus a router-style `CLAUDE.md`. |
 | **Prompt packs** | `general` (code review, deploy verification, post-mortem, regression sweep), `web3` (chain E2E, indexer unit economics, RPC cost, order latency), `security` (application audit, server hardening, dependency drift). |
 
@@ -71,7 +71,7 @@ The ecosystem has excellent collections; this is deliberately narrow.
 ## How it fits together
 
 A plan is written from `templates/plan.md` and validated by `plan-gate.sh` before
-implementation — it refuses a plan whose premises are asserted rather than read.
+implementation. It refuses a plan whose premises are asserted rather than read.
 While you work, the rules are injected when you touch matching code, and the
 blocking hooks catch a broken build or a migration you cannot reverse before the
 turn ends. After the deploy, `deploy-verify-run.md` asks for activation proof
@@ -86,18 +86,18 @@ running on its own; so is the plan gate.
 
 Three incidents, anonymised, with the numbers left in:
 
-1. [A guard that could not fail](EXAMPLES/01-the-vacuous-guard.md) — the gate that
+1. [A guard that could not fail](EXAMPLES/01-the-vacuous-guard.md). The gate that
    went green on the document introducing the rule it enforced.
 2. [A window that inverted a verdict](EXAMPLES/02-the-window-that-inverted-a-verdict.md)
-   — a 56% improvement that five-minute samples reported as a regression.
+   A 56% improvement that five-minute samples reported as a regression.
 3. [The setting that lived in another table](EXAMPLES/03-the-setting-in-another-table.md)
-   — "13 accounts have no restriction", from a query against one of the two
+   "13 accounts have no restriction", from a query against one of the two
    tables that hold that setting.
 
 ## Two install paths, and why the installer is the primary one
 
 **`rules/` is not a plugin component.** Project rules load from the workspace's
-`.claude/rules/`, so a plugin install delivers commands, hooks and skills — and
+`.claude/rules/`, so a plugin install delivers commands, hooks and skills, and
 none of the rules, prompt packs, templates or the knowledge linter. That is not a
 packaging oversight; it is what the plugin system supports. The installer
 delivers everything, which is why it is the documented path.
@@ -111,13 +111,13 @@ delivers everything, which is why it is the documented path.
 The manifests are validated against the documented schema by `make verify`
 (checked against the official reference on 2026-09-08, including that every path
 they name exists). What has **not** happened is a real `/plugin marketplace add`
-run — that is a user action, and until someone performs it the end-to-end plugin
+run. That is a user action, and until someone performs it the end-to-end plugin
 path is unproven. Recorded here rather than assumed to work.
 
 ## Trust model
 
-Installing cairn means shell scripts run automatically in your session — one at
-session start, three after every edit — and the edit-time one invokes **your
+Installing cairn means shell scripts run automatically in your session: one at
+session start, three after every edit, and the edit-time one invokes **your
 project's toolchain**, which for Rust means executing that project's `build.rs`.
 That is normal for a language server and worth knowing anyway. `.cairn/config.json`
 is treated as untrusted input: values that reach a shell are pattern-validated,
@@ -132,7 +132,7 @@ edit-time hook off when working in repositories you have not read.
 Extracted from two private production codebases. No host, credential, threshold,
 quota or internal identifier from either is published:
 `scripts/sanitize-check.sh` is a CI gate, and it was written and calibrated
-**before** any content was moved — a scanner added afterwards does not rewrite
+**before** any content was moved. A scanner added afterwards does not rewrite
 git history. It caught its own first piece of content, which is why the internal
 planning document lives outside the repository.
 

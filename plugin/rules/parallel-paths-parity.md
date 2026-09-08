@@ -12,7 +12,7 @@ safety probe alongside the executor it protects. Parity between them is a
 critical invariant that is usually enforced by nothing but discipline.
 
 The cost of drift is not proportional to the size of the divergence. One
-simulation reported **+97%** on a strategy that lost **99.76%** live — same
+simulation reported **+97%** on a strategy that lost **99.76%** live: same
 inputs, one missing rule on one side.
 
 When you add or change a rule on a path that has a twin:

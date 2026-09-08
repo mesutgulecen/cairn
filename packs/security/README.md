@@ -18,7 +18,7 @@ wrong:
 
 - **"Is a backup configured" is not the question.** "When was a restore last
   performed" is. An untested backup is a belief, and the retention window has to
-  exceed the time it takes to *notice* corruption — otherwise a restore restores
+  exceed the time it takes to *notice* corruption. Otherwise a restore restores
   the corruption.
 - **A drift finding names which side is wrong.** When the running state differs
   from the baseline document, it is as often a stale document as a misconfigured

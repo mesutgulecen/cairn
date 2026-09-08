@@ -1,10 +1,10 @@
-# Incident — <one-line symptom> (<YYYY-MM-DD>)
+# Incident: <one-line symptom> (<YYYY-MM-DD>)
 
 **Severity:** <money | data | availability | cosmetic> · **Detected by:** <alert |
 user report | audit | chance> · **Duration:** <first bad event> → <resolved>
 
 Every field below is mandatory and evidence-based. "Probably" is not a finding.
-If something is unknown, write `UNVERIFIED` and say what read would settle it —
+If something is unknown, write `UNVERIFIED` and say what read would settle it.
 an honest gap is useful; a confident guess is not.
 
 ## Symptom
@@ -32,7 +32,7 @@ number in the whole document. It measures your instrumentation, not your luck.
 ## Root cause
 
 The mechanism, at the level of a specific line, query or configuration value. Not
-"a race condition" — *which* two operations, in what order, on what state.
+"a race condition" is a category. *Which* two operations, in what order, on what state.
 
 ## Why it was invisible
 
@@ -58,7 +58,7 @@ understanding of the fix, not the behaviour of the bug.
 ## Same-pattern sweep
 
 Where else does this pattern exist? List what you searched for and what you found
-— including "searched X, found none", which is a result.
+including "searched X, found none", which is a result.
 
 ## Follow-ups
 

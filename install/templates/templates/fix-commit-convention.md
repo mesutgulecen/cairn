@@ -6,7 +6,7 @@ was found, and what stops it coming back.
 ```
 fix(<area>): <what is now true, not what you did>
 
-<Why it was wrong. The mechanism, not the symptom — the reader can see the
+<Why it was wrong. The mechanism, not the symptom. The reader can see the
 symptom in the issue. Name the specific line, query or value.>
 
 <What made it invisible: why review, tests and monitoring all passed.>

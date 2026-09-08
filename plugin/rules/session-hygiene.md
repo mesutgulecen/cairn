@@ -1,5 +1,5 @@
 ---
-description: Keep the session cheap and resumable — where output goes, what gets delegated, what gets written down
+description: Keep the session cheap and resumable: where output goes, what gets delegated, what gets written down
 paths:
   - "**"
 ---
@@ -7,7 +7,7 @@ paths:
 # Session hygiene
 
 These are process rules, not code rules. They exist because the most expensive
-pattern in AI-assisted work is not a wrong answer — it is a root-cause hunt that
+pattern in AI-assisted work is not a wrong answer. It is a root-cause hunt that
 takes five sessions, each one re-deriving what the last already knew.
 
 1. **Bulk output goes to a file, not into the conversation.** Log dumps, query
@@ -18,7 +18,7 @@ takes five sessions, each one re-deriving what the last already knew.
    snake_case event tag and `key=value` fields. You are writing it for the
    `grep` you will run at 2am, not for a human reading sequentially.
 3. **Delegate verbose reads to a cheaper model.** Large scans return a *summary*
-   — a median and a count — to the main session, never a wall of rows. Report
+   (a median and a count) to the main session, never a wall of rows. Report
    medians and counts; an average over a heavy tail describes nothing (see
    `measurement-discipline` §3).
 4. **Keep a progress file for the active phase, and surface it on session start.**
@@ -32,6 +32,6 @@ takes five sessions, each one re-deriving what the last already knew.
    is often you, later, without the context.
 6. **One worktree per concurrent session.** If two sessions may touch the
    repository at once, give each its own `git worktree`. Otherwise one session's
-   uncommitted edits get swept into the other's commit — which has happened, and
+   uncommitted edits get swept into the other's commit, which has happened, and
    is nearly invisible in review. Until then, `git diff --stat HEAD` before every
    commit.

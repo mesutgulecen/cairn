@@ -1,7 +1,7 @@
 # Skills
 
 Three skills, all authored here. They cover the three things this repository asks
-you to write — a plan, an audit, a memory note — because a template shows the
+you to write: a plan, an audit, a memory note. A template shows the
 shape and a skill carries the judgement.
 
 | Skill | Invoked when |
@@ -12,9 +12,9 @@ shape and a skill carries the judgement.
 
 ## Frontend and motion skills
 
-Not shipped here, on purpose. The best ones are already maintained upstream —
+Not shipped here, on purpose. The best ones are already maintained upstream.
 [emilkowalski/skills](https://github.com/emilkowalski/skills) (MIT) covers
-animation craft, motion review and toast handling — and vendoring a copy means
+animation craft, motion review and toast handling, and vendoring a copy means
 inheriting the job of tracking its drift.
 
 If you want them, install them from upstream and pin the commit:

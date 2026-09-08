@@ -38,7 +38,7 @@ Two adjacent traps in the same family:
 
 - **A lockfile that the deploy does not use.** If CI tests with one resolver and
   the deploy installs with another, the dependency set you tested is not the set
-  you shipped — and a lockfile audit proves nothing about production.
+  you shipped, and a lockfile audit proves nothing about production.
 - **A vendored copy is a fork.** Pinning a commit is right; forgetting that it
   is now yours to patch is not. Record the upstream, the pinned commit and the
   date, and diff on a schedule.

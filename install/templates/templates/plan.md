@@ -1,4 +1,4 @@
-# <Title> — plan (<YYYY-MM-DD>)
+# <Title>, plan (<YYYY-MM-DD>)
 
 **Tier:** K2 · **Owner:** <name> · **Status:** draft
 
@@ -16,7 +16,7 @@ symptom, you are not ready to plan.
 ## Assumption Ledger
 
 Premises about things **outside** your control. Anything unresolved is marked
-`[NEEDS PROBE]`, and implementation does not start while one is open — the gate
+`[NEEDS PROBE]`, and implementation does not start while one is open. The gate
 enforces this, but the rule is yours, not the gate's.
 
 | # | Assumption | How it was checked | Status |
@@ -26,7 +26,7 @@ enforces this, but the rule is yours, not the gate's.
 
 ## Internal-state premises
 
-Premises about **your own** system — a flag's deployed value, whether a backfill
+Premises about **your own** system: a flag's deployed value, whether a backfill
 finished, whether a gate is already on, what a config actually contains. These
 are the ones that get assumed rather than read, and each is refutable by a single
 query, log grep or config dump. Name that read.
@@ -42,7 +42,7 @@ What you will change, in order. Name the files or modules. If you claim a
 speedup, cite the timing:
 
 **Measured-basis:** <what was timed, how many samples, p50 and range>. Not
-derived by subtracting one stage from the total — an intercept absorbs everything
+derived by subtracting one stage from the total, since an intercept absorbs everything
 that does not scale.
 
 ## Flag coupling
@@ -53,7 +53,7 @@ lands dormant and looks like a bug months later.
 
 ## Variant matrix
 
-Every arm this touches — chain, tenant, region, currency, plan, agent kind — and
+Every arm this touches (chain, tenant, region, currency, plan, agent kind) and
 what changes for each. An arm that changes nothing is written down as "no change",
 never omitted: an omitted arm is indistinguishable from a forgotten one.
 
@@ -86,7 +86,7 @@ The exact steps, and whether they are safe to run under load.
 
 ## Shall continue to
 
-At least three behaviours this must **not** break — the other variant, the
+At least three behaviours this must **not** break: the other variant, the
 parallel path, the adjacent trigger. A fix with no stated blast radius has an
 unbounded one.
 

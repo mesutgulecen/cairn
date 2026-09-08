@@ -1,10 +1,10 @@
-# 1 — A guard that could not fail
+# 1. A guard that could not fail
 
 ## What happened
 
 A planning process had a rule: a high-risk plan must carry a section listing its
-premises about the team's *own* system — a flag's deployed value, whether a
-backfill finished, whether a gate was already on — because those are the premises
+premises about the team's *own* system: a flag's deployed value, whether a
+backfill finished, whether a gate was already on, because those are the premises
 that get assumed rather than read.
 
 Prose in a checklist had not been enough, so the rule was given a script. The
@@ -17,7 +17,7 @@ Two more checks in the same script had the same shape:
 
 - A check for unresolved probe markers fired on a **resolved** ledger row,
   because the row quoted the marker while reporting its answer. A gate that
-  cries wolf on a correct document gets switched off — and then the two checks
+  cries wolf on a correct document gets switched off, and then the two checks
   that worked go off with it.
 - A check requiring a direct measurement behind any claimed speedup had been
   **silently dead** since the day `set -o pipefail` was added to the script. It
@@ -31,7 +31,7 @@ Two more checks in the same script had the same shape:
 All three were green. There is no observable difference between a guard that
 passes because the input is clean and a guard that passes because it cannot fail.
 Every code review of that script read it as correct, because read as prose it
-*is* correct — the defect is in what the tools do, not in what the author meant.
+*is* correct. The defect is in what the tools do, not in what the author meant.
 
 ## What it cost
 
@@ -44,7 +44,7 @@ refutable by a single query.
 
 Every guard in this repository ships with an input it **must reject** and an
 input it **must accept**, and `make verify` runs both. The leak scanner goes
-further and asserts that *every one of its patterns* fires on the dirty fixture —
+further and asserts that *every one of its patterns* fires on the dirty fixture,
 which immediately found two patterns that could not match anything at all.
 
 `CONTRIBUTING.md` states the rule plainly: a guard is not accepted without a

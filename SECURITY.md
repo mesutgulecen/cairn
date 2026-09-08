@@ -10,7 +10,7 @@ understand before you install:
 | Hook | Runs | Executes |
 |---|---|---|
 | `session-start.sh` | at session start | `git log`, `ls`, and the knowledge linter (`python3`) |
-| `post-edit-lint.sh` | after editing a source file | **your project's toolchain** — see below |
+| `post-edit-lint.sh` | after editing a source file | **your project's toolchain**, see below |
 | `migration-guard.sh` | after editing a `*.up.sql` | `python3`, reading two files |
 | `env-drift.sh` | after editing a config file | `git diff`, `grep` |
 
@@ -24,7 +24,7 @@ understand before you install:
 - `go build` / `go vet` compile the package, which can invoke a C toolchain
   through cgo.
 
-None of this is exotic — it is what your editor's language server already does —
+None of this is exotic. It is what your editor's language server already does,
 but it is worth stating plainly: **editing a file in an untrusted repository
 runs that repository's build tooling.** If you work in repositories you have not
 read, switch it off:
@@ -46,7 +46,7 @@ change it. cairn therefore treats it as untrusted:
   vector.
 
 This is not hypothetical. An earlier version ran `eval $kb_command` with the
-string taken straight from that file — arbitrary command execution, at session
+string taken straight from that file: arbitrary command execution, at session
 start, with no prompt, from a file that arrives with `git clone`. It was found
 by auditing this repository against its own security prompt, demonstrated with a
 harmless `touch`, and removed. `scripts/test-install.sh hostile-config` now runs
@@ -61,7 +61,7 @@ IP literals, secret-looking environment names, and forbidden filenames.
 
 **Your own names go in a deny file, not in the script.** Copy
 `scripts/sanitize-deny.example.txt` to `.cairn/sanitize-deny.txt` and add your
-company, hosts, internal domains, issue prefixes and tenant ids — one
+company, hosts, internal domains, issue prefixes and tenant ids, one
 `label|regex` per line. Two reasons it works this way: you should not have to
 edit a vendored scanner to add a name, and **a deny list committed to a public
 repository is a directory of exactly the names it exists to remove.** This
@@ -73,13 +73,13 @@ point at it with `--deny` or `CAIRN_DENY_FILE`.
 **It is not a general-purpose secret scanner.** It has no entropy analysis and no
 maintained rule set behind it. For a repository that handles real credentials,
 run it alongside a dedicated tool (`gitleaks`, `trufflehog`) rather than instead
-of one. Its own coverage is asserted — every pattern must fire on the fixture —
+of one. Its own coverage is asserted, since every pattern must fire on the fixture,
 so what it claims to catch, it catches; it makes no claim about the rest.
 
 `--history` scans every text blob in the git history, because a secret deleted
 from the working tree is still in the history, and the history is what a clone
 hands to a stranger. It skips `fixtures/` and the scanner's own file, both of
-which contain patterns and fake secrets by design — so a full sweep of your own
+which contain patterns and fake secrets by design, so a full sweep of your own
 history for *project names* is a separate, deliberate run with your deny file.
 
 ## Reporting a vulnerability

@@ -11,7 +11,7 @@ Five hooks, in two families.
 | `migration-guard.sh` | `PostToolUse` | a migration you cannot reverse, or a table born without its invariant |
 
 Each of the three ships with fixtures under `fixtures/` and is asserted by
-`make verify` — both the exit code and the reason.
+`make verify`, both the exit code and the reason.
 
 ## Advisory (exit 0, adds context)
 

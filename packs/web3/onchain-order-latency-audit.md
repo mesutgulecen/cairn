@@ -1,4 +1,4 @@
-# Prompt — on-chain order latency, by segment
+# Prompt: on-chain order latency, by segment
 
 Where the time goes between "a reason to act exists" and "the transaction is
 confirmed". The point is attribution: a total is not actionable, and a total
@@ -26,7 +26,7 @@ subtraction.
 | 7 | confirm | included → final at your required commitment |
 
 Publish `accounted` against `total`. When they diverge, you have found a stage
-you did not know existed — which is the usual outcome, and the most valuable one.
+you did not know existed, which is the usual outcome, and the most valuable one.
 In one trace the dominant consumer was the admission stage, before any of the
 candidates anyone had proposed.
 
@@ -39,7 +39,7 @@ candidates anyone had proposed.
    blocks describes neither the normal case nor the bad one.
 3. **Verify the timer's scope before trusting it.** A deferred stop-call placed
    inside a conditional block can be function-scoped rather than block-scoped, so
-   one segment silently absorbs the following ones — the exact mis-attribution
+   one segment silently absorbs the following ones: the exact mis-attribution
    this audit exists to prevent, produced by the instrument. Calibrate against a
    case with a known answer: one slow stage, one fast one, and the fast one must
    stay fast.

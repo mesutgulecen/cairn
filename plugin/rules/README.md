@@ -31,7 +31,7 @@ paths:
 they all match, and `measurement-discipline.md` alone is a third of it. The
 budget is the reason `paths` exists, not tidiness.
 
-The shipped `paths` are `"**"` — deliberately wrong for your project. **Narrow
+The shipped `paths` are `"**"`, deliberately wrong for your project. **Narrow
 them on install.** A rule that fires on every edit is a rule that gets skimmed,
 and a skimmed rule protects nothing. Point each one at the code where its failure
 actually lives.

@@ -1,6 +1,6 @@
-# Prompt — Solana pipeline audit (end to end)
+# Prompt: Solana pipeline audit (end to end)
 
-Sibling of `evm-chain-e2e-audit.md`. **The body is identical by design** — only
+Sibling of `evm-chain-e2e-audit.md`. **The body is identical by design**. Only
 §0 differs. When the shared method changes, update both files; when a chain fact
 changes, update only that file's §0. This is the whole point of the chain-profile
 pattern: one method, several instances, no divergence by accident.
@@ -11,7 +11,7 @@ pattern: one method, several instances, no divergence by accident.
 | `mode` | `read-only` | `read-only` \| `exercise` (explicit authorisation) |
 | `output` | `docs/audits/<date>/solana-e2e-<date>.md` | report path |
 
-## §0 — Chain profile
+## §0. Chain profile
 
 | Field | Value |
 |---|---|

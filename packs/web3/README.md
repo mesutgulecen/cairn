@@ -21,13 +21,13 @@ in at install time: `install/install.sh --packs general,web3 --apply`.
 
 The two E2E prompts share one body and differ only in §0. When the **method**
 changes, update both; when a **chain fact** changes, update only that file's §0.
-Adding a third chain is a new §0, not a new prompt — which is the point: the
+Adding a third chain is a new §0, not a new prompt, which is the point: the
 alternative is three documents that diverge silently, and the divergence is
 discovered during an incident.
 
 ## What was removed before publishing
 
-Chain names, provider names and contract standards are public, and they stay —
+Chain names, provider names and contract standards are public and they stay,
 an audit prompt that cannot name what it audits is useless. Removed:
 
 - measured quotas, key counts, rate limits and cost figures from a specific
@@ -37,7 +37,7 @@ an audit prompt that cannot name what it audits is useless. Removed:
 - prompts covering product features rather than infrastructure.
 
 What survives is the **method** and the **traps**: the numbers that remain are
-the ones that teach — 1,780× from a constant matched across chains, 97.7–98.8% of
+the ones that teach: 1,780× from a constant matched across chains, 97.7–98.8% of
 a call budget spent before the first provider, 82% of spend unattributed until a
 one-line tag, 495 rows deleted because a mantissa was read without its exponent.
 Those describe a *class* of mistake, not a deployment.

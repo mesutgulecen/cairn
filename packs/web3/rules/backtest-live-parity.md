@@ -16,7 +16,7 @@ strategy; it is a second implementation of it, and it drifts like any other.
 
 1. **Every gate exists on both sides, or the asymmetry is written down.** Entry
    filters, exit triggers, cooldowns, position limits, dust handling. If the
-   simulation lacks one, say why in the commit — silence reads as an omission,
+   simulation lacks one, say why in the commit. Silence reads as an omission,
    and six months later nobody can tell which it was.
 2. **The price ladder must have the same rungs, in the same order.** If live
    resolves a price through fresh quote → cache → persisted snapshot → give up,
@@ -36,5 +36,5 @@ strategy; it is a second implementation of it, and it drifts like any other.
    an indicative probe had passed.
 6. **Simulated time must not see the future.** Any lookup keyed by "latest"
    rather than "as of the simulated instant" leaks hindsight, and the leak
-   always improves the result — which is why it is never noticed by the person
+   always improves the result, which is why it is never noticed by the person
    who benefits from it.
