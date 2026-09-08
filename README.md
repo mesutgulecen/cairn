@@ -3,8 +3,8 @@
 *A cairn is a stack of stones left on a trail so the next traveller does not get
 lost. This repository is the same idea for engineering with Claude Code.*
 
-**Status: installable. Everything except the web3 pack and the case studies is
-done.** See the roadmap.
+**Status: installable. Everything except the case studies is done.** See the
+roadmap.
 
 ## What this is
 
@@ -37,6 +37,7 @@ is narrow on purpose.
 git clone <this repo> && cd cairn
 ./install/install.sh --target /path/to/your/project          # dry run, writes nothing
 ./install/install.sh --target /path/to/your/project --apply
+./install/install.sh --target /path/to/your/project --packs general,web3 --apply
 ```
 
 It never overwrites an existing file, backs up `.claude/settings.json` before
@@ -50,7 +51,7 @@ your project on purpose.
 make verify
 ```
 
-Thirty assertions run, and they are the argument this repository is making.
+Thirty-one assertions run, and they are the argument this repository is making.
 The plan gate must reject a plan that *describes* the section it is asked to
 open, and must accept one whose resolved probe row quotes the marker while
 answering it. The migration guard must reject an exemption written without a
@@ -74,9 +75,9 @@ Wiring the hooks into a project is described in `plugin/hooks/README.md`.
 | F2 | 5 hooks + calibration fixtures | **done** |
 | F3 | knowledge-base linter + note schema | **done** |
 | F4 | doc skeleton, templates, 4 general prompts | **done** |
-| F4.5 | `web3` sector pack (chain E2E, indexer unit economics, RPC cost) | next |
+| F4.5 | `web3` sector pack (chain E2E, indexer unit economics, RPC cost) | **done** |
 | F5 | installer (done) + plugin manifest (**unverified**, see below) | **mostly** |
-| F6 | anonymised case studies | |
+| F6 | anonymised case studies | next |
 | F7 | launch | |
 
 ## Known gap

@@ -56,6 +56,19 @@ fresh)
   [ "$rc" -eq 0 ] || fail "the installed gate rejected the installed template (rc=$rc)"
   ;;
 
+packs)
+  t=$(mktemp -d)
+  "$SRC/install/install.sh" --apply --target "$t" --packs general,web3 >/dev/null 2>&1; rc=$?
+  [ "$rc" -eq 0 ] || { rm -rf "$t"; fail "install exited $rc"; }
+  have "$t" "docs/prompts/web3/indexer-architecture-audit.md" || { rm -rf "$t"; exit 1; }
+  have "$t" "docs/prompts/general/code-review.md" || { rm -rf "$t"; exit 1; }
+  # A pack's own rules belong with the core rules, not under docs/prompts/.
+  have "$t" ".claude/rules/chain-scoping.md" || { rm -rf "$t"; exit 1; }
+  rules=$(find "$t/.claude/rules" -name '*.md' | wc -l | tr -d ' ')
+  rm -rf "$t"
+  [ "$rules" -eq 9 ] || fail "expected 6 core + 3 pack rules, found $rules"
+  ;;
+
 idempotent)
   t=$(mktemp -d)
   "$SRC/install/install.sh" --apply --target "$t" >/dev/null 2>&1
@@ -93,6 +106,6 @@ JSON
   rm -rf "$t"
   ;;
 
-*) echo "usage: test-install.sh <dry-run|fresh|idempotent|preserves>" >&2; exit 2 ;;
+*) echo "usage: test-install.sh <dry-run|fresh|packs|idempotent|preserves>" >&2; exit 2 ;;
 esac
 exit 0

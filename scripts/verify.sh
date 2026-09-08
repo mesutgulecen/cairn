@@ -147,6 +147,7 @@ echo
 echo "installer calibration"
 expect 0 "the default run writes nothing"        scripts/test-install.sh dry-run
 expect 0 "an empty project ends up working"      scripts/test-install.sh fresh
+expect 0 "a pack installs its prompts AND rules" scripts/test-install.sh packs
 expect 0 "a second run duplicates no hooks"      scripts/test-install.sh idempotent
 expect 0 "existing settings and guide survive"   scripts/test-install.sh preserves
 expect 0 "shipped manifests are valid JSON"      python3 -c "

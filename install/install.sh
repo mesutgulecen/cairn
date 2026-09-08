@@ -118,6 +118,15 @@ IFS=',' read -r -a pack_list <<< "$PACKS"
 for pack in "${pack_list[@]}"; do
   [ -d "$SRC/packs/$pack" ] || { say "skip" "$pack (no such pack)"; continue; }
   for f in "$SRC/packs/$pack"/*.md; do copy_file "$f" "docs/prompts/$pack/$(basename "$f")"; done
+  # A pack may carry rules of its own. They belong beside the core rules, not
+  # under docs/prompts/ — they are injected at edit time, not read on demand.
+  # Missing this line installed the web3 pack's prompts and silently dropped its
+  # three rules, which is the shape of bug the rules themselves are about.
+  if [ -d "$SRC/packs/$pack/rules" ]; then
+    for f in "$SRC/packs/$pack/rules"/*.md; do
+      copy_file "$f" ".claude/rules/$(basename "$f")"
+    done
+  fi
 done
 
 echo
