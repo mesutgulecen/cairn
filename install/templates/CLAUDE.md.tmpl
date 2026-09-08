@@ -1,0 +1,51 @@
+# <Project> — agent guide
+
+<One sentence: what this system is and what it is made of.>
+
+**This file is a router. It is terse by design.** Detail lives in the linked
+documents. **When the code and this file disagree, the code wins** — and this
+file gets fixed in the same commit.
+
+The reason for the discipline is a budget: this file is loaded into every
+session. Every paragraph here is a paragraph you pay for whether or not it is
+relevant to the task at hand, and a long guide is skimmed rather than read.
+Aim for a page. A second page needs a reason.
+
+## Doc map
+
+Read the relevant document **before** working in that area — the section you
+need, not the whole file.
+
+| Topic | Doc |
+|---|---|
+| Deploy + production topology | `docs/runbooks/deploy.md` |
+| Data invariants (per-column rules) | `docs/decisions/data-invariants.md` |
+| <subsystem> | `docs/decisions/<subsystem>.md` |
+| Dated implementation backstory | `docs/CHANGELOG-internal.md` |
+
+## Non-obvious invariants
+
+The short list of things that are true, load-bearing, and impossible to infer
+from reading one file. Keep it to what an agent would otherwise reinvent
+incorrectly — a formula, a state machine, a unit, a threshold.
+
+- **<name>:** <the rule, in one or two lines, with its unit>
+
+## Conventions
+
+- **Errors:** <how>
+- **Migrations:** <naming, and the command that must run with them>
+- **Logging:** <structured fields; what must never be logged>
+- **Tests:** <the commands, and which one CI actually gates on>
+
+## Path-scoped rules
+
+Detailed, edit-time guidance for recurring failure classes lives in
+`.claude/rules/` and is injected when a matching file is edited. The summaries
+above are the always-on version; the rule files carry the checklists.
+
+## Planning
+
+Plans live in `docs/plans/<date>/`, use `templates/plan.md`, and a K2 plan is
+validated with `.claude/hooks/plan-gate.sh <plan.md>` before implementation
+starts.

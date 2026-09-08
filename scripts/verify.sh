@@ -106,6 +106,10 @@ expect_reason 2 "a multiplier with no direct timing" "Measured-basis" \
   $G $F/must-fail/04-unsourced-multiplier.md
 expect 0 "complete plan passes (resolved probe, hex)" $G $F/must-pass/01-complete.md
 expect 0 "a lower tier is not argued with"           $G $F/must-pass/02-lower-tier.md
+# The gate looks for the sections the template provides. Nothing else keeps the
+# two in step, and a gate that rejects its own template is how a process gets
+# abandoned in week two.
+expect 0 "the shipped plan template passes the gate" $G install/templates/templates/plan.md
 
 echo
 echo "migration-guard calibration"
