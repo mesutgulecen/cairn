@@ -40,8 +40,10 @@ post-edit-lint calibration      broken source fed back · valid source silent
 knowledge-lint calibration      one of each decay mode found · forward link tolerated
 installer calibration           dry run writes nothing · idempotent · brownfield · preserves
 manifest calibration            missing owner rejected · missing path rejected
+hostile config                  nothing executes · the session still starts
+history scan                    no secret in any blob any commit ever held
 link check calibration          renamed target caught · code fences ignored
-38 passed, 0 failed
+40 passed, 0 failed
 ```
 
 Several of those assertions exist because the thing they check was, at some
@@ -111,6 +113,19 @@ The manifests are validated against the documented schema by `make verify`
 they name exists). What has **not** happened is a real `/plugin marketplace add`
 run — that is a user action, and until someone performs it the end-to-end plugin
 path is unproven. Recorded here rather than assumed to work.
+
+## Trust model
+
+Installing cairn means shell scripts run automatically in your session — one at
+session start, three after every edit — and the edit-time one invokes **your
+project's toolchain**, which for Rust means executing that project's `build.rs`.
+That is normal for a language server and worth knowing anyway. `.cairn/config.json`
+is treated as untrusted input: values that reach a shell are pattern-validated,
+and none is ever composed into a command line.
+
+[SECURITY.md](SECURITY.md) has the detail, including the arbitrary-execution bug
+this repository's own security prompt found in it, and how to switch the
+edit-time hook off when working in repositories you have not read.
 
 ## Provenance and safety
 

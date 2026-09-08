@@ -15,9 +15,27 @@ set -uo pipefail
 
 cd "$(cairn_root)" 2>/dev/null || exit 0
 
-progress_glob="$(cairn_config hooks.session_start.progress_glob 'docs/plans/*/*-progress.md')"
-plans_glob="$(cairn_config hooks.session_start.plans_glob 'docs/plans/*/*.md')"
-kb_cmd="$(cairn_config hooks.session_start.kb_command 'knowledge/knowledge_lint.py --quiet')"
+# Config values are validated, never trusted. Globs may contain path characters
+# and wildcards and nothing else.
+GLOB_RE='[A-Za-z0-9_*?./-]+'
+progress_glob="$(cairn_config_safe hooks.session_start.progress_glob 'docs/plans/*/*-progress.md' "$GLOB_RE")"
+plans_glob="$(cairn_config_safe hooks.session_start.plans_glob 'docs/plans/*/*.md' "$GLOB_RE")"
+
+# The knowledge summary is chosen from a FIXED SET of tools, not supplied as a
+# command line. This used to be `eval $kb_cmd` with the string taken straight
+# from .cairn/config.json — which is arbitrary command execution, at session
+# start, with no prompt, from a file that arrives with a git clone. Demonstrated
+# by writing a file with `touch`; it could as easily have been anything else.
+#
+# There is no legitimate use for a free-form command here: everyone runs the
+# knowledge linter. Configuration selects; it does not compose a shell line.
+kb_tool="$(cairn_config_safe hooks.session_start.kb_tool 'knowledge_lint' '(knowledge_lint|none)')"
+kb_path="$(cairn_config_safe hooks.session_start.kb_path 'knowledge/knowledge_lint.py' '[A-Za-z0-9_./-]+')"
+case "$kb_path" in *..*) kb_path='knowledge/knowledge_lint.py' ;; esac
+
+if [ -n "$(cairn_config hooks.session_start.kb_command '')" ]; then
+  echo "cairn: hooks.session_start.kb_command is no longer supported (it allowed arbitrary command execution). Use kb_tool and kb_path." >&2
+fi
 
 recent=$(git log --oneline -5 2>/dev/null || true)
 
@@ -30,10 +48,11 @@ proghead=""
 [ -n "${prog}" ] && proghead=$(head -40 "${prog}" 2>/dev/null || true)
 
 # The knowledge base usually lives outside the repo, so this cannot be a CI job.
+# Invoked as an argument vector: no shell, so nothing in the path or the config
+# is ever re-parsed as a command.
 kb=""
-if [ -n "$kb_cmd" ]; then
-  # shellcheck disable=SC2086
-  kb=$(eval $kb_cmd 2>/dev/null || true)
+if [ "$kb_tool" = "knowledge_lint" ] && [ -f "$kb_path" ]; then
+  kb=$(python3 "$kb_path" --quiet 2>/dev/null || true)
 fi
 
 ctx="## Session continuity"$'\n\n'"### Recent commits"$'\n'"${recent:-(none)}"

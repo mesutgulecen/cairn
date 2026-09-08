@@ -38,7 +38,7 @@ script="$here/adapters/${adapter}.sh"
 # An edit-time gate needs a ceiling. `timeout` is absent on some systems (and
 # named gtimeout on others); without it we simply run unbounded rather than
 # failing, because a missing utility must not block an edit.
-limit="$(cairn_config hooks.post_edit.timeout_seconds 60)"
+limit="$(cairn_config_safe hooks.post_edit.timeout_seconds 60 '[0-9]{1,4}')"
 runner=""
 if command -v timeout >/dev/null 2>&1; then runner="timeout $limit"
 elif command -v gtimeout >/dev/null 2>&1; then runner="gtimeout $limit"; fi

@@ -117,6 +117,45 @@ JSON
   rm -rf "$t"
   ;;
 
+hostile-config)
+  # .cairn/config.json arrives with a git clone and can be changed by a pull
+  # request. It is untrusted input, and it reaches a shell. This pins that a
+  # hostile value cannot execute anything, and — just as important — that it
+  # does not stop the session from starting: a guard that bricks the session is
+  # a guard people remove.
+  t=$(mktemp -d)
+  "$SRC/install/install.sh" --apply --target "$t" >/dev/null 2>&1
+  mkdir -p "$t/.cairn"
+  cat > "$t/.cairn/config.json" <<JSON
+{ "hooks": {
+    "session_start": {
+      "kb_command": "touch $t/PWNED-legacy",
+      "kb_tool": "knowledge_lint; touch $t/PWNED-tool",
+      "kb_path": "../../../etc/passwd",
+      "progress_glob": "\$(touch $t/PWNED-glob)"
+    },
+    "post_edit": { "timeout_seconds": "60; touch $t/PWNED-timeout" }
+} }
+JSON
+  ( cd "$t" && CLAUDE_PROJECT_DIR="$t" ./.claude/hooks/session-start.sh ) >"$t/out.json" 2>"$t/err.txt"
+  rc=$?
+  echo "x = 1" > "$t/sample.py"
+  printf '{"tool_input":{"file_path":"%s/sample.py"}}' "$t" > "$t/payload.json"
+  ( cd "$t" && CLAUDE_PROJECT_DIR="$t" ./.claude/hooks/post-edit-lint.sh < "$t/payload.json" ) >/dev/null 2>&1
+
+  pwned=$(find "$t" -maxdepth 1 -name 'PWNED-*' | wc -l | tr -d ' ')
+  started=0
+  grep -q 'Session continuity' "$t/out.json" 2>/dev/null && started=1
+  warned=0
+  grep -q 'no longer supported' "$t/err.txt" 2>/dev/null && warned=1
+  rm -rf "$t"
+
+  [ "$pwned" -eq 0 ] || fail "hostile config executed $pwned command(s)"
+  [ "$rc" -eq 0 ]    || fail "hostile config stopped the session (rc=$rc)"
+  [ "$started" -eq 1 ] || fail "hook produced no context — a bad config must not brick the session"
+  [ "$warned" -eq 1 ]  || fail "the removed kb_command was not reported to the user"
+  ;;
+
 idempotent)
   t=$(mktemp -d)
   "$SRC/install/install.sh" --apply --target "$t" >/dev/null 2>&1
@@ -149,11 +188,12 @@ JSON
   grep -q 'Bash(ls:\*)' "$t/.claude/settings.json" || { rm -rf "$t"; fail "unrelated key was dropped"; }
   grep -q 'echo mine'   "$t/.claude/settings.json" || { rm -rf "$t"; fail "existing hook was dropped"; }
   grep -q 'session-start.sh' "$t/.claude/settings.json" || { rm -rf "$t"; fail "our hook was not added"; }
-  [ -e "$t/.claude/settings.json.bak" ] || { rm -rf "$t"; fail "no backup was taken"; }
+  n=$(find "$t/.claude" -name 'settings.json.*.bak' | wc -l | tr -d ' ')
+  [ "$n" -ge 1 ] || { rm -rf "$t"; fail "no backup was taken"; }
   grep -q '^# my own guide' "$t/CLAUDE.md" || { rm -rf "$t"; fail "existing CLAUDE.md was overwritten"; }
   rm -rf "$t"
   ;;
 
-*) echo "usage: test-install.sh <dry-run|fresh|packs|brownfield|idempotent|preserves>" >&2; exit 2 ;;
+*) echo "usage: test-install.sh <dry-run|fresh|packs|brownfield|hostile-config|idempotent|preserves>" >&2; exit 2 ;;
 esac
 exit 0

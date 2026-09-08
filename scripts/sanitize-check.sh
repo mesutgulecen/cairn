@@ -38,6 +38,19 @@ PATTERNS=(
   'rpc-url-key|https?://[a-z0-9.-]*(alchemy|helius|ankr|infura|quicknode)[a-z0-9.-]*(/[A-Za-z0-9_.-]+)*/[A-Za-z0-9_-]{16,}'
   'deployment-env-name|\b(ACME|BILLING|LEDGER)_[A-Z0-9_]{3,}\b'
 
+  # --- generic secret material (not deployment-specific) ------------------
+  # These are here because a scanner whose only job is "our identifiers" gets
+  # adopted as a leak gate by everyone who installs it. Measured 2026-09-08:
+  # of eight common secret classes, this file caught one. That gap is not a
+  # theoretical exposure for us; it is a false assurance for a user.
+  'aws-access-key|\bAKIA[0-9A-Z]{16}\b'
+  'gcp-api-key|\bAIza[0-9A-Za-z_-]{35}\b'
+  'npm-token|\bnpm_[A-Za-z0-9]{36}\b'
+  'stripe-key|\bsk_(live|test)_[A-Za-z0-9]{16,}'
+  'jwt|\beyJ[A-Za-z0-9_-]{8,}\.eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}'
+  'auth-header|Authorization:[[:space:]]*(Bearer|Basic)[[:space:]]+[A-Za-z0-9._~+/=-]{16,}'
+  '(?i)assigned-secret|(api[_-]?key|secret|passwd|password|access[_-]?token)[[:space:]]*[:=][[:space:]]*["'"'"'][^"'"'"']{12,}["'"'"']'
+
   # --- our organisations, products and domains ----------------------------
   'internal-name|[Aa]cme|[Bb]eacon(App)?|ExampleLabs'
   'internal-domain|[a-z0-9-]+\.(xyz|internal|lan)\b'
@@ -60,9 +73,44 @@ PATTERNS=(
 # the clean fixture is what surfaced it.
 ALLOWED_LITERALS='(0\.0\.0\.0|127\.0\.0\.1|255\.255\.255\.255|localhost)'
 
-roots=("$@")
+# Files that should never be committed at all, whatever is inside them. A
+# content pattern cannot catch an empty-looking .env or a binary key.
+# `.env.example` / `.env.sample` / `.env.template` are things projects commit on
+# purpose. A rule that forbids "anything starting with .env" would reject them,
+# and a scanner that cries wolf on a correct repository gets switched off — so
+# the list names the real environment files instead of a prefix.
+FORBIDDEN_NAMES='^(\.env|\.env\.(local|dev|development|test|staging|prod|production)|id_(rsa|dsa|ecdsa|ed25519)|.*\.(pem|p12|pfx|keystore|jks))$'
+
+HISTORY=0
+EXPLICIT=0
+roots=()
+for arg in "$@"; do
+  case "$arg" in
+    --history) HISTORY=1 ;;
+    *) roots+=("$arg"); EXPLICIT=1 ;;
+  esac
+done
 if [ ${#roots[@]} -eq 0 ]; then
   roots=(.)
+fi
+
+# A secret deleted from the working tree is still in the history, and history is
+# what a clone hands to a stranger. This mode materialises every text blob any
+# commit ever contained and scans that instead.
+if [ "$HISTORY" -eq 1 ]; then
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' EXIT
+  git rev-list --all --objects 2>/dev/null | while read -r sha obj; do
+    [ -z "$obj" ] && continue
+    case "$obj" in
+      */fixtures/*|fixtures/*) continue ;;
+      *.md|*.sh|*.py|*.json|*.yml|*.yaml|*.txt|*.tmpl|*.toml|*.cfg|*.ini) ;;
+      *) continue ;;
+    esac
+    git cat-file blob "$sha" > "$tmp/${sha:0:8}-$(basename "$obj")" 2>/dev/null || true
+  done
+  echo "sanitize-check: scanning $(ls "$tmp" | wc -l | tr -d ' ') historical blob(s)"
+  roots=("$tmp")
 fi
 
 # The scanner and its calibration fixtures contain the patterns themselves, so
@@ -73,22 +121,48 @@ EXCLUDES=(
   --exclude-dir=node_modules
   --exclude-dir=fixtures
   --exclude-dir=.local
-  --exclude=sanitize-check.sh
+  # The glob has a wildcard because --history materialises blobs as
+  # `<sha>-sanitize-check.sh`: the scanner's own pattern list matches its own
+  # patterns, and a bare basename exclude misses the renamed copies.
+  --exclude=*sanitize-check.sh
 )
 
 findings=0
 for entry in "${PATTERNS[@]}"; do
   label="${entry%%|*}"
   regex="${entry#*|}"
-  hits=$(grep -rEnI "${EXCLUDES[@]}" -- "$regex" "${roots[@]}" 2>/dev/null | grep -v 'sanitize-ok:' || true)
+  # A pattern may ask for case-insensitivity with an `(?i)` prefix on its LABEL;
+  # grep -E has no inline flag, so it becomes a -i on the invocation.
+  ci=""
+  case "$label" in
+    '(?i)'*) ci="-i"; label="${label#(?i)}" ;;
+  esac
+  hits=$(grep -rEnI $ci "${EXCLUDES[@]}" -- "$regex" "${roots[@]}" 2>/dev/null | grep -v 'sanitize-ok:' || true)
   [ -z "$hits" ] && continue
   while IFS= read -r line; do
     stripped=$(printf '%s' "$line" | sed -E "s/${ALLOWED_LITERALS}//g")
-    printf '%s' "$stripped" | grep -Eq -- "$regex" || continue
+    printf '%s' "$stripped" | grep -Eq $ci -- "$regex" || continue
     printf 'LEAK[%s] %s\n' "$label" "$line"
     findings=$((findings + 1))
   done <<< "$hits"
 done
+
+# Forbidden filenames, checked separately: this is about the name, not the bytes.
+while IFS= read -r f; do
+  base="$(basename "$f")"
+  if printf '%s' "$base" | grep -qE "$FORBIDDEN_NAMES"; then
+    printf 'LEAK[forbidden-filename] %s\n' "$f"
+    findings=$((findings + 1))
+  fi
+done < <(
+  if [ "$EXPLICIT" -eq 1 ]; then
+    # Given an explicit root, scan it whole — that is how the fixtures get
+    # checked. Excluding fixtures unconditionally would blind this check to its
+    # own calibration, which is the failure this repository is about.
+    find "${roots[@]}" -type f -not -path '*/.git/*' 2>/dev/null
+  else
+    find "${roots[@]}" -type f -not -path '*/.git/*' -not -path '*/fixtures/*' -not -path '*/.local/*' 2>/dev/null
+  fi)
 
 if [ "$findings" -gt 0 ]; then
   printf '\nsanitize-check: %d finding(s) — nothing ships until these are redacted or waived.\n' "$findings" >&2

@@ -52,6 +52,26 @@ else:
 ' "$key" "$default" "$(cairn_root)" 2>/dev/null || printf '%s' "$default"
 }
 
+# cairn_config_safe <dotted.key> <default> <extended-regex>
+# A configuration value that reaches a shell must be VALIDATED, not merely read.
+# `.cairn/config.json` is a file inside the repository: it arrives with a clone,
+# it can be changed by a pull request, and nobody reviews it the way they review
+# code. A value from it is untrusted input.
+#
+# An out-of-pattern value falls back to the default and says so on stderr —
+# silently substituting would hide a misconfiguration, and failing would let a
+# bad config stop a session from starting.
+cairn_config_safe() {
+  local key="$1" default="$2" pattern="$3" value
+  value="$(cairn_config "$key" "$default")"
+  if printf '%s' "$value" | grep -qE "^${pattern}$"; then
+    printf '%s' "$value"
+  else
+    printf '%s' "$default"
+    echo "cairn: ignoring ${key}=${value} — does not match ${pattern}" >&2
+  fi
+}
+
 # Non-blocking advice back to the model (exit 0 keeps the turn going).
 cairn_emit_context() {
   local event="$1" msg="$2"

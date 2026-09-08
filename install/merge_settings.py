@@ -6,14 +6,16 @@ second run adds nothing. The naive version of this script appends the whole
 block each time, and the symptom — every hook running two, then three times —
 looks like a performance problem rather than an install bug.
 
-Never destructive: the existing file is backed up first, unrelated keys are left
-untouched, and an unparseable file aborts the merge rather than replacing it.
+Never destructive: the existing file is backed up first (to a timestamped name
+that is never reused), unrelated keys are left untouched, and an unparseable
+file aborts the merge rather than replacing it.
 """
 from __future__ import annotations
 
 import json
 import shutil
 import sys
+import time
 from pathlib import Path
 
 
@@ -32,7 +34,12 @@ def main() -> int:
         except json.JSONDecodeError as exc:
             print(f"  abort     {dest} is not valid JSON ({exc}) — merge skipped", file=sys.stderr)
             return 1
-        backup = dest.with_suffix(".json.bak")
+        # Timestamped, and never overwritten. A fixed `.bak` name means the
+        # SECOND install overwrites the backup with the already-merged file, so
+        # the original settings are gone exactly when someone needs them back.
+        backup = dest.with_name(f"{dest.name}.{int(time.time())}.bak")
+        while backup.exists():
+            backup = dest.with_name(f"{dest.name}.{int(time.time())}-{id(backup) % 1000}.bak")
         shutil.copy2(dest, backup)
         print(f"  backup    {backup.name}")
 

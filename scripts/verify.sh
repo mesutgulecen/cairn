@@ -77,14 +77,18 @@ expect 0 "clean fixture is accepted"  scripts/sanitize-check.sh fixtures/sanitiz
 # stay green regardless. Two were exactly that on the first run.
 echo
 echo "pattern coverage"
-declared=$(grep -oE "^  '[a-z0-9-]+\\|" scripts/sanitize-check.sh | tr -d " '|" | sort -u)
+declared=$(grep -oE "^  '(\(\?i\))?[a-z0-9-]+\\|" scripts/sanitize-check.sh \
+           | sed -E "s/^ *'(\(\?i\))?//; s/\\|$//" | sort -u)
 exercised=$(scripts/sanitize-check.sh fixtures/sanitize/dirty 2>/dev/null \
             | sed -E 's/^LEAK\[([a-z0-9-]+)\].*/\1/' | sort -u)
 uncovered=$(comm -23 <(printf '%s\n' "$declared") <(printf '%s\n' "$exercised"))
 if [ -z "$uncovered" ]; then
-  printf '  ok   %-44s %d/%d patterns\n' "every pattern fires on the fixture" \
-    "$(printf '%s\n' "$exercised" | wc -l | tr -d ' ')" \
-    "$(printf '%s\n' "$declared" | wc -l | tr -d ' ')"
+  # Count the DECLARED patterns that fired, not every label the run emitted:
+  # the filename check is not in the pattern list, and counting it produced a
+  # cheerful "22/21".
+  matched=$(comm -12 <(printf '%s\n' "$declared") <(printf '%s\n' "$exercised") | wc -l | tr -d ' ')
+  printf '  ok   %-44s %s/%s patterns\n' "every pattern fires on the fixture" \
+    "$matched" "$(printf '%s\n' "$declared" | wc -l | tr -d ' ')"
   pass=$((pass + 1))
 else
   printf '  FAIL %-44s\n' "patterns never exercised by any fixture"
@@ -149,6 +153,7 @@ expect 0 "the default run writes nothing"        scripts/test-install.sh dry-run
 expect 0 "an empty project ends up working"      scripts/test-install.sh fresh
 expect 0 "a pack installs its prompts AND rules" scripts/test-install.sh packs
 expect 0 "a project with its own files keeps them" scripts/test-install.sh brownfield
+expect 0 "a hostile config executes nothing"     scripts/test-install.sh hostile-config
 expect 0 "a second run duplicates no hooks"      scripts/test-install.sh idempotent
 expect 0 "existing settings and guide survive"   scripts/test-install.sh preserves
 expect_reason 1 "a manifest missing owner is rejected" "owner" \
@@ -171,6 +176,7 @@ expect 0 "external links and anchors are ignored"          scripts/check-links.p
 echo
 echo "repository scan"
 expect 0 "every relative link resolves"                    scripts/check-links.py
+expect 0 "no secret in any historical blob"                scripts/sanitize-check.sh --history
 expect 0 "repo is clean"              scripts/sanitize-check.sh
 
 echo
