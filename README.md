@@ -3,8 +3,8 @@
 *A cairn is a stack of stones left on a trail so the next traveller does not get
 lost. This repository is the same idea for engineering with Claude Code.*
 
-**Status: early. Everything except the web3 pack, the installer and the case
-studies is done.** See the roadmap.
+**Status: installable. Everything except the web3 pack and the case studies is
+done.** See the roadmap.
 
 ## What this is
 
@@ -31,14 +31,26 @@ Not an agent collection, not a prompt megapack, not a wrapper around Claude
 Code. If you want breadth, the ecosystem has excellent collections already. Cairn
 is narrow on purpose.
 
-## Try what exists
+## Install it
 
 ```sh
 git clone <this repo> && cd cairn
+./install/install.sh --target /path/to/your/project          # dry run, writes nothing
+./install/install.sh --target /path/to/your/project --apply
+```
+
+It never overwrites an existing file, backs up `.claude/settings.json` before
+merging into it, and matches hook entries by command so a second run adds
+nothing. Then narrow the rules' `paths` globs — the shipped `"**"` is wrong for
+your project on purpose.
+
+## What `make verify` proves
+
+```sh
 make verify
 ```
 
-Twenty-five assertions run, and they are the argument this repository is making.
+Thirty assertions run, and they are the argument this repository is making.
 The plan gate must reject a plan that *describes* the section it is asked to
 open, and must accept one whose resolved probe row quotes the marker while
 answering it. The migration guard must reject an exemption written without a
@@ -47,7 +59,9 @@ fires, because two of them once could not match anything at all. The knowledge
 linter must find exactly one of each decay mode in a corpus seeded with one of
 each — and must NOT fail on a link to a note that has not been written yet. The
 shipped plan template must pass the shipped plan gate, because a gate that
-rejects its own template is how a process gets abandoned in week two.
+rejects its own template is how a process gets abandoned in week two. The
+installer's default run must create zero files, and an existing settings.json
+must come out the other side with its own keys and its own hooks intact.
 
 Wiring the hooks into a project is described in `plugin/hooks/README.md`.
 
@@ -61,9 +75,17 @@ Wiring the hooks into a project is described in `plugin/hooks/README.md`.
 | F3 | knowledge-base linter + note schema | **done** |
 | F4 | doc skeleton, templates, 4 general prompts | **done** |
 | F4.5 | `web3` sector pack (chain E2E, indexer unit economics, RPC cost) | next |
-| F5 | Claude Code plugin + installer | |
+| F5 | installer (done) + plugin manifest (**unverified**, see below) | **mostly** |
 | F6 | anonymised case studies | |
 | F7 | launch | |
+
+## Known gap
+
+The plugin manifests (`.claude-plugin/marketplace.json`, `plugin/hooks/hooks.json`)
+are written but have **not** been installed through `/plugin marketplace add` and
+verified end to end. Until that run happens, use the installer — it is the path
+covered by tests. This is recorded here rather than quietly assumed to work,
+which is the same standard the rules ask of everything else.
 
 ## Provenance
 

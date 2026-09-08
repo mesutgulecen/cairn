@@ -144,6 +144,19 @@ expect_reason 1 "an over-budget index is found" "OVER"          kb drifted --ind
 expect        0 "a dangling forward link does NOT fail" kb forward-link
 
 echo
+echo "installer calibration"
+expect 0 "the default run writes nothing"        scripts/test-install.sh dry-run
+expect 0 "an empty project ends up working"      scripts/test-install.sh fresh
+expect 0 "a second run duplicates no hooks"      scripts/test-install.sh idempotent
+expect 0 "existing settings and guide survive"   scripts/test-install.sh preserves
+expect 0 "shipped manifests are valid JSON"      python3 -c "
+import json,pathlib
+for p in ['.claude-plugin/marketplace.json','plugin/.claude-plugin/plugin.json',
+          'plugin/hooks/hooks.json','plugin/hooks/hooks.settings.json']:
+    json.loads(pathlib.Path(p).read_text())
+"
+
+echo
 echo "repository scan"
 expect 0 "repo is clean"              scripts/sanitize-check.sh
 

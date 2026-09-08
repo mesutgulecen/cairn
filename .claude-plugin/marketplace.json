@@ -1,0 +1,15 @@
+{
+  "name": "cairn",
+  "owner": { "name": "cairn" },
+  "metadata": {
+    "description": "Evidence-first engineering discipline for Claude Code: guards that ship with their calibration."
+  },
+  "plugins": [
+    {
+      "name": "cairn",
+      "source": "./plugin",
+      "description": "Seven commands and five hooks for plan discipline, edit-time checks and knowledge-base health.",
+      "version": "0.1.0"
+    }
+  ]
+}
