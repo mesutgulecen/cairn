@@ -158,7 +158,13 @@ for p in ['.claude-plugin/marketplace.json','plugin/.claude-plugin/plugin.json',
 "
 
 echo
+echo "link check calibration"
+expect_reason 1 "a renamed target is caught" "old-name.md" scripts/check-links.py fixtures/links/broken
+expect 0 "external links and anchors are ignored"          scripts/check-links.py fixtures/links/clean
+
+echo
 echo "repository scan"
+expect 0 "every relative link resolves"                    scripts/check-links.py
 expect 0 "repo is clean"              scripts/sanitize-check.sh
 
 echo
