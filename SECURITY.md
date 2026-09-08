@@ -78,7 +78,9 @@ so what it claims to catch, it catches; it makes no claim about the rest.
 
 `--history` scans every text blob in the git history, because a secret deleted
 from the working tree is still in the history, and the history is what a clone
-hands to a stranger.
+hands to a stranger. It skips `fixtures/` and the scanner's own file, both of
+which contain patterns and fake secrets by design — so a full sweep of your own
+history for *project names* is a separate, deliberate run with your deny file.
 
 ## Reporting a vulnerability
 
