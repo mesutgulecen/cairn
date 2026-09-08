@@ -1,0 +1,25 @@
+name: verify
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The guards run before anything else: a leak that reaches a public commit
+      # is not undone by a later fix.
+      - name: Guard calibration + repository scan
+        run: make verify
+
+      # Internal planning material lives in .local/ and must never be tracked.
+      - name: .local stays untracked
+        run: |
+          tracked=$(git ls-files .local | head -5)
+          if [ -n "$tracked" ]; then
+            echo "internal files are tracked:"; echo "$tracked"; exit 1
+          fi
+          echo "ok: .local untracked"

@@ -1,0 +1,67 @@
+# cairn
+
+*A cairn is a stack of stones left on a trail so the next traveller does not get
+lost. This repository is the same idea for engineering with Claude Code.*
+
+**Status: early. F0 (the leak gate) is the only finished piece.** See the
+roadmap below before expecting to install anything.
+
+## What this is
+
+Most Claude Code repositories distribute **content**: agents, commands, prompt
+collections. Cairn distributes **process** — the small number of mechanisms that
+decided, in two production codebases, whether an AI-assisted change was correct
+or merely plausible:
+
+- **Guards that ship with their calibration.** Every guard here comes with an
+  input it must reject and an input it must accept, and `make verify` runs both.
+  A guard nobody has watched fail has not been shown to work; it is
+  indistinguishable from a guard that always passes.
+- **A knowledge base that lints itself.** Notes and docs drift silently: links
+  break, notes become unreachable, an index grows past the token budget it
+  costs every session. A linter turns those into build output.
+- **A plan gate that refuses unproven premises.** A plan that carries a section
+  heading is not a plan that carries evidence.
+- **Rules written from incidents, not from taste.** Each one opens with the
+  measurement that produced it.
+
+## What this is not
+
+Not an agent collection, not a prompt megapack, not a wrapper around Claude
+Code. If you want breadth, the ecosystem has excellent collections already. Cairn
+is narrow on purpose.
+
+## Try the one piece that exists
+
+```sh
+git clone <this repo> && cd cairn
+make verify
+```
+
+You should see the leak scanner reject the deliberately dirty fixture, accept
+the deliberately tricky clean one, prove that all 14 of its patterns actually
+fire, and then pass over the repository itself.
+
+## Roadmap
+
+| Phase | Contents | Status |
+|---|---|---|
+| F0 | leak gate + calibration harness + CI | **done** |
+| F1 | 6 portable rules | next |
+| F2 | 5 hooks + plan-gate fixtures | |
+| F3 | knowledge-base linter + note schema | |
+| F4 | doc skeleton, templates, 4 general prompts | |
+| F4.5 | `web3` sector pack (chain E2E, indexer unit economics, RPC cost) | |
+| F5 | Claude Code plugin + installer | |
+| F6 | anonymised case studies | |
+| F7 | launch | |
+
+## Provenance
+
+Cairn is extracted from two private production codebases. No configuration,
+host, credential, threshold or internal identifier from either one is published:
+`scripts/sanitize-check.sh` is a CI gate, and it was written and calibrated
+*before* any content was moved, because a scanner added afterwards does not
+rewrite git history.
+
+MIT licensed.

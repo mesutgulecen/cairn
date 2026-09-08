@@ -1,0 +1,8 @@
+# Internal working material: planning notes written against the private source
+# projects. Never published — the leak scanner also skips this directory, and
+# CI asserts it stays untracked.
+.local/
+
+.DS_Store
+node_modules/
+__pycache__/
