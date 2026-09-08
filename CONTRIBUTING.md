@@ -32,6 +32,8 @@ freely; keep the number.
 make verify
 ```
 
-CI runs the same command. If you need to publish a string the scanner flags,
+CI runs the same command. Project-specific names belong in a deny file
+(`scripts/sanitize-deny.example.txt` is the template), never inline in the
+scanner. If you need to publish a string the scanner flags,
 justify it inline with `sanitize-ok: <reason>` — a claim that the match is a
 false positive, never permission to publish a real identifier.

@@ -31,12 +31,12 @@ PATTERNS=(
   'psql-target|(psql +-h|postgres(ql)?://[^ )"]*@)'
   'private-key-file|id_(ed25519|rsa|ecdsa)'
   'private-key-block|BEGIN [A-Z ]*PRIVATE KEY'
-  'systemd-unit|(acme|beacon|example)[a-z0-9_-]*\.(service|timer)'
+  'systemd-unit|systemctl[[:space:]]+(restart|start|stop|enable|disable)[[:space:]]+[a-z0-9_@.-]+\.(service|timer)'
 
   # --- credentials --------------------------------------------------------
   'token-literal|\b(gh[pousr]_[A-Za-z0-9]{16,}|sk-[A-Za-z0-9]{20,}|xox[baprs]-[A-Za-z0-9-]{10,})'
   'rpc-url-key|https?://[a-z0-9.-]*(alchemy|helius|ankr|infura|quicknode)[a-z0-9.-]*(/[A-Za-z0-9_.-]+)*/[A-Za-z0-9_-]{16,}'
-  'deployment-env-name|\b(ACME|BILLING|LEDGER)_[A-Z0-9_]{3,}\b'
+  'secret-env-name|\b[A-Z][A-Z0-9]*(_[A-Z0-9]+)*_(KEY|SECRET|TOKEN|PASSWORD|PASSWD|CREDENTIALS?|PRIVATE_KEY)\b'
 
   # --- generic secret material (not deployment-specific) ------------------
   # These are here because a scanner whose only job is "our identifiers" gets
@@ -51,16 +51,6 @@ PATTERNS=(
   'auth-header|Authorization:[[:space:]]*(Bearer|Basic)[[:space:]]+[A-Za-z0-9._~+/=-]{16,}'
   '(?i)assigned-secret|(api[_-]?key|secret|passwd|password|access[_-]?token)[[:space:]]*[:=][[:space:]]*["'"'"'][^"'"'"']{12,}["'"'"']'
 
-  # --- our organisations, products and domains ----------------------------
-  'internal-name|[Aa]cme|[Bb]eacon(App)?|ExampleLabs'
-  'internal-domain|[a-z0-9-]+\.(xyz|internal|lan)\b'
-
-  # --- internal issue / work identifiers ----------------------------------
-  'issue-id|\b(ACME|SEC)-[0-9]{1,4}\b'
-  'issue-id-e2e|\b(APP|SVC)-E2E-[0-9]{1,4}\b'
-
-  # --- niche signals -------------------------------------------------------
-  'example-chain-id|\b4663\b'
 )
 
 # Literals that match a pattern but identify no deployment. Stripped from a
@@ -81,17 +71,45 @@ ALLOWED_LITERALS='(0\.0\.0\.0|127\.0\.0\.1|255\.255\.255\.255|localhost)'
 # the list names the real environment files instead of a prefix.
 FORBIDDEN_NAMES='^(\.env|\.env\.(local|dev|development|test|staging|prod|production)|id_(rsa|dsa|ecdsa|ed25519)|.*\.(pem|p12|pfx|keystore|jks))$'
 
+# Project-specific names — your company, your hosts, your issue prefixes, your
+# product names — do NOT belong in this file. They belong in a deny file, for
+# two reasons. You should not have to edit a vendored script to add them; and a
+# deny list committed to a public repository is a directory of exactly the names
+# it exists to remove. (That is not hypothetical: this script used to carry the
+# source projects' names, and publishing it would have announced them.)
+#
+# Format: one `label|extended-regex` per line, `#` comments and blanks ignored.
+# A label may carry a leading `(?i)` for case-insensitive matching.
+DENY_FILE="${CAIRN_DENY_FILE:-.cairn/sanitize-deny.txt}"
+
 HISTORY=0
 EXPLICIT=0
 roots=()
-for arg in "$@"; do
-  case "$arg" in
+# A `for arg in "$@"` loop cannot consume an option's value: the list is
+# captured before the body runs, so a `shift` inside it moves $1 while the loop
+# keeps iterating over the original words. The first draft did exactly that, and
+# the deny file silently became a scan ROOT — so the run that was supposed to
+# check the whole repository checked one file, and reported clean.
+while [ $# -gt 0 ]; do
+  case "$1" in
     --history) HISTORY=1 ;;
-    *) roots+=("$arg"); EXPLICIT=1 ;;
+    --deny)
+      [ $# -ge 2 ] || { echo "--deny needs a file" >&2; exit 2; }
+      DENY_FILE="$2"; shift ;;
+    *) roots+=("$1"); EXPLICIT=1 ;;
   esac
+  shift
 done
 if [ ${#roots[@]} -eq 0 ]; then
   roots=(.)
+fi
+
+deny_loaded=0
+if [ -f "$DENY_FILE" ]; then
+  while IFS= read -r line; do
+    case "$line" in ''|'#'*) continue ;; esac
+    case "$line" in *'|'*) PATTERNS+=("$line"); deny_loaded=$((deny_loaded + 1)) ;; esac
+  done < "$DENY_FILE"
 fi
 
 # A secret deleted from the working tree is still in the history, and history is
@@ -168,5 +186,5 @@ if [ "$findings" -gt 0 ]; then
   printf '\nsanitize-check: %d finding(s) — nothing ships until these are redacted or waived.\n' "$findings" >&2
   exit 1
 fi
-echo "sanitize-check: clean (${#PATTERNS[@]} patterns over: ${roots[*]})"
+echo "sanitize-check: clean (${#PATTERNS[@]} patterns$([ "$deny_loaded" -gt 0 ] && echo ", $deny_loaded from $DENY_FILE") over: ${roots[*]})"
 exit 0

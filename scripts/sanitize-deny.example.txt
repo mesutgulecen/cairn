@@ -1,0 +1,16 @@
+# Copy to .cairn/sanitize-deny.txt and fill in YOUR names.
+# One `label|extended-regex` per line. `#` comments and blank lines ignored.
+# A leading `(?i)` on the label makes that pattern case-insensitive.
+#
+# What belongs here: anything that identifies YOU rather than a secret in
+# general — company and product names, internal hostnames and domains, issue-id
+# prefixes, environment-variable prefixes, account or tenant ids.
+#
+# Keep it out of a public repository if the names themselves are sensitive: a
+# deny list is a directory of exactly the things it exists to remove.
+
+company-name|[Aa]cme([ -]?Corp)?|AcmeLabs
+internal-domain|[a-z0-9-]+\.(acme-internal|corp|lan)\b
+env-prefix|\b(ACME|BILLING|LEDGER)_[A-Z0-9_]{3,}\b
+issue-id|\b(ACME|SEC)-[0-9]{1,5}\b
+tenant-id|\bacct_[0-9a-f]{12}\b

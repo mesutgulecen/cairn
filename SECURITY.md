@@ -55,9 +55,20 @@ the session still starts.
 
 ## What `sanitize-check.sh` is and is not
 
-It scans for deployment identifiers (hosts, credentials, internal work ids) and
-for a set of common secret shapes: AWS, Google, npm, Stripe, JWT, bearer
-headers, assigned secrets, private keys, and environment files by name.
+It scans for generic secret shapes: AWS, Google, npm and Stripe keys, JWTs,
+bearer headers, assigned secrets, private keys and blocks, connection strings,
+IP literals, secret-looking environment names, and forbidden filenames.
+
+**Your own names go in a deny file, not in the script.** Copy
+`scripts/sanitize-deny.example.txt` to `.cairn/sanitize-deny.txt` and add your
+company, hosts, internal domains, issue prefixes and tenant ids — one
+`label|regex` per line. Two reasons it works this way: you should not have to
+edit a vendored scanner to add a name, and **a deny list committed to a public
+repository is a directory of exactly the names it exists to remove.** This
+repository learned that on itself: the scanner used to carry the source
+projects' names inline, and publishing it would have announced every one of
+them. If your names are sensitive, keep the deny file out of the repository and
+point at it with `--deny` or `CAIRN_DENY_FILE`.
 
 **It is not a general-purpose secret scanner.** It has no entropy analysis and no
 maintained rule set behind it. For a repository that handles real credentials,

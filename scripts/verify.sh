@@ -71,6 +71,13 @@ expect_payload() {
 echo "sanitize-check calibration"
 expect 1 "dirty fixture is rejected"  scripts/sanitize-check.sh fixtures/sanitize/dirty
 expect 0 "clean fixture is accepted"  scripts/sanitize-check.sh fixtures/sanitize/clean
+# Project names live in a deny file, not in the script: you should not have to
+# edit a vendored scanner to add your own, and a deny list in a public repo is a
+# directory of the names it exists to remove.
+expect        0 "no deny file: a project name passes" \
+  env CAIRN_DENY_FILE=/nonexistent scripts/sanitize-check.sh fixtures/sanitize/deny/mentions-company.md
+expect_reason 1 "with a deny file: it is caught" "made-up-company" \
+  scripts/sanitize-check.sh --deny fixtures/sanitize/deny/deny.txt fixtures/sanitize/deny/mentions-company.md
 
 # A pattern with no line in the dirty fixture has never been shown to fire. It
 # may be broken (a regex that cannot match its own target) and the suite would
@@ -177,7 +184,14 @@ echo
 echo "repository scan"
 expect 0 "every relative link resolves"                    scripts/check-links.py
 expect 0 "no secret in any historical blob"                scripts/sanitize-check.sh --history
-expect 0 "repo is clean"              scripts/sanitize-check.sh
+# Our own project names are in .local/ (gitignored, never published), so this
+# run also uses them when present. CI has only the built-in patterns; the local
+# run is where an accidental mention of a source project gets caught.
+if [ -f .local/sanitize-deny.txt ]; then
+  expect 0 "repo is clean (incl. local deny list)" scripts/sanitize-check.sh --deny .local/sanitize-deny.txt
+else
+  expect 0 "repo is clean"              scripts/sanitize-check.sh
+fi
 
 echo
 printf '%d passed, %d failed\n' "$pass" "$fail"

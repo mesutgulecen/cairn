@@ -1,0 +1,2 @@
+# fixture deny list
+made-up-company|[Zz]orblax(Industries)?
