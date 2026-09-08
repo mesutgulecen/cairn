@@ -148,8 +148,14 @@ echo "installer calibration"
 expect 0 "the default run writes nothing"        scripts/test-install.sh dry-run
 expect 0 "an empty project ends up working"      scripts/test-install.sh fresh
 expect 0 "a pack installs its prompts AND rules" scripts/test-install.sh packs
+expect 0 "a project with its own files keeps them" scripts/test-install.sh brownfield
 expect 0 "a second run duplicates no hooks"      scripts/test-install.sh idempotent
 expect 0 "existing settings and guide survive"   scripts/test-install.sh preserves
+expect_reason 1 "a manifest missing owner is rejected" "owner" \
+  scripts/check-manifests.py fixtures/manifests/invalid-marketplace/.claude-plugin/marketplace.json
+expect_reason 1 "a manifest naming a missing path fails" "does not exist" \
+  scripts/check-manifests.py fixtures/manifests/invalid-plugin/.claude-plugin/plugin.json
+expect 0 "shipped manifests match the documented schema" scripts/check-manifests.py
 expect 0 "shipped manifests are valid JSON"      python3 -c "
 import json,pathlib
 for p in ['.claude-plugin/marketplace.json','plugin/.claude-plugin/plugin.json',

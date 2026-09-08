@@ -12,8 +12,10 @@ change was correct or merely plausible.
 git clone <this repo> && cd cairn
 ./install/install.sh --target /path/to/your/project              # dry run
 ./install/install.sh --target /path/to/your/project --apply
-./install/install.sh --target /path/to/your/project --packs general,web3 --apply
+./install/install.sh --target /path/to/your/project --packs general,web3,security --apply
 ```
+
+New here? [QUICKSTART.md](QUICKSTART.md) walks the first ten minutes.
 
 The installer never overwrites an existing file, backs up `.claude/settings.json`
 before merging into it, and matches hook entries by command so a second run adds
@@ -36,9 +38,10 @@ plan-gate calibration           4 rejected for the right reason · 3 accepted
 migration-guard calibration     4 rejected · 2 accepted
 post-edit-lint calibration      broken source fed back · valid source silent
 knowledge-lint calibration      one of each decay mode found · forward link tolerated
-installer calibration           dry run writes nothing · idempotent · preserves
+installer calibration           dry run writes nothing · idempotent · brownfield · preserves
+manifest calibration            missing owner rejected · missing path rejected
 link check calibration          renamed target caught · code fences ignored
-34 passed, 0 failed
+38 passed, 0 failed
 ```
 
 Several of those assertions exist because the thing they check was, at some
@@ -52,10 +55,11 @@ match anything at all. The plan gate had a check that was dead from the day
 |---|---|
 | **6 rules** | injected at edit time by path. Each opens with the measurement that produced it — a window, a ratio, a count — because a rule that says "measure carefully" is advice, and one that says "1.49x over 25 minutes was 1.043x over 9.32 hours" changes behaviour. |
 | **5 hooks** | three that block (plan discipline, edit-time compile, migration invariants) and two that advise (session continuity, config drift). |
+| **3 skills** | `plan-authoring`, `audit-authoring`, `memory-notes` — the judgement behind the three things this repo asks you to write. Frontend/motion skills are deliberately not vendored; the README points upstream instead. |
 | **7 commands** | `/plan-new` `/plan-gate` `/kb-lint` `/deploy-verify` `/incident` `/regression-sweep` `/code-review` |
 | **A knowledge linter** | four silent decay modes — link drift, unreachable notes, schema drift, an index over its per-session token budget — turned into build output. |
 | **Templates** | plan (tiered, with the discipline gates as sections), incident, audit, and a commit convention. Plus a router-style `CLAUDE.md`. |
-| **Prompt packs** | `general` (code review, deploy verification, post-mortem, regression sweep) and `web3` (chain E2E, indexer unit economics, RPC cost, order latency). |
+| **Prompt packs** | `general` (code review, deploy verification, post-mortem, regression sweep), `web3` (chain E2E, indexer unit economics, RPC cost, order latency), `security` (application audit, server hardening, dependency drift). |
 
 ## What this is not
 
@@ -88,13 +92,25 @@ Three incidents, anonymised, with the numbers left in:
    — "13 accounts have no restriction", from a query against one of the two
    tables that hold that setting.
 
-## Known gap
+## Two install paths, and why the installer is the primary one
 
-The plugin manifests (`.claude-plugin/marketplace.json`, `plugin/hooks/hooks.json`)
-are written but have **not** been verified end to end through
-`/plugin marketplace add`. Until that run happens, use the installer — it is the
-path covered by tests. Recorded here rather than quietly assumed to work, which
-is the standard the rules ask of everything else.
+**`rules/` is not a plugin component.** Project rules load from the workspace's
+`.claude/rules/`, so a plugin install delivers commands, hooks and skills — and
+none of the rules, prompt packs, templates or the knowledge linter. That is not a
+packaging oversight; it is what the plugin system supports. The installer
+delivers everything, which is why it is the documented path.
+
+| | plugin install | `install/install.sh` |
+|---|---|---|
+| commands, hooks, skills | yes | yes |
+| rules (6 core + pack rules) | **no** | yes |
+| prompt packs, templates, docs skeleton, knowledge linter | **no** | yes |
+
+The manifests are validated against the documented schema by `make verify`
+(checked against the official reference on 2026-09-08, including that every path
+they name exists). What has **not** happened is a real `/plugin marketplace add`
+run — that is a user action, and until someone performs it the end-to-end plugin
+path is unproven. Recorded here rather than assumed to work.
 
 ## Provenance and safety
 

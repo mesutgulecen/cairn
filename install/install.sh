@@ -91,6 +91,14 @@ for f in "$SRC"/plugin/commands/*.md; do
 done
 
 echo
+echo "skills"
+for d in "$SRC"/plugin/skills/*/; do
+  name="$(basename "$d")"
+  [ -f "$d/SKILL.md" ] || continue
+  copy_file "$d/SKILL.md" ".claude/skills/$name/SKILL.md"
+done
+
+echo
 echo "knowledge"
 copy_file "$SRC/knowledge/knowledge_lint.py" "knowledge/knowledge_lint.py"
 copy_file "$SRC/knowledge/note-schema.md" "knowledge/note-schema.md"
