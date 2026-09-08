@@ -29,6 +29,45 @@ expect() {
   fi
 }
 
+# expect_reason <want-rc> <name> <reason-substring> <cmd...>
+# Exit code alone is a weak assertion: a guard can reject the right document for
+# the wrong reason and still look calibrated. The reason is checked too.
+expect_reason() {
+  local want="$1" name="$2" needle="$3"; shift 3
+  local out rc
+  out=$("$@" 2>&1); rc=$?
+  if [ "$rc" -eq "$want" ] && printf '%s' "$out" | grep -qF -- "$needle"; then
+    printf '  ok   %-44s rc=%d\n' "$name" "$rc"
+    pass=$((pass + 1))
+  else
+    printf '  FAIL %-44s rc=%d (want %d, reason ~ %s)\n' "$name" "$rc" "$want" "$needle"
+    printf '%s\n' "$out" | sed 's/^/         | /' | head -12
+    fail=$((fail + 1))
+  fi
+}
+
+# expect_payload <want-rc> <name> <reason-substring|-> <hook> <file> [project-dir]
+# Drives a stdin-payload hook the way the harness does. The payload goes through
+# a file, not a pipe: a pipeline would put its own status where the hook's should
+# be, which is the exact mistake these guards exist to prevent.
+expect_payload() {
+  local want="$1" name="$2" needle="$3" hook="$4" file="$5" projdir="${6:-$PWD}"
+  local out rc tmp
+  tmp=$(mktemp)
+  python3 -c 'import json,sys; print(json.dumps({"tool_input": {"file_path": sys.argv[1]}}))' \
+    "$file" > "$tmp"
+  out=$(CLAUDE_PROJECT_DIR="$projdir" "$hook" < "$tmp" 2>&1); rc=$?
+  rm -f "$tmp"
+  if [ "$rc" -eq "$want" ] && { [ "$needle" = "-" ] || printf '%s' "$out" | grep -qF -- "$needle"; }; then
+    printf '  ok   %-44s rc=%d\n' "$name" "$rc"
+    pass=$((pass + 1))
+  else
+    printf '  FAIL %-44s rc=%d (want %d, reason ~ %s)\n' "$name" "$rc" "$want" "$needle"
+    printf '%s\n' "$out" | sed 's/^/         | /' | head -12
+    fail=$((fail + 1))
+  fi
+}
+
 echo "sanitize-check calibration"
 expect 1 "dirty fixture is rejected"  scripts/sanitize-check.sh fixtures/sanitize/dirty
 expect 0 "clean fixture is accepted"  scripts/sanitize-check.sh fixtures/sanitize/clean
@@ -52,6 +91,38 @@ else
   printf '%s\n' "$uncovered" | sed 's/^/         | /'
   fail=$((fail + 1))
 fi
+
+echo
+echo "plan-gate calibration"
+G=plugin/hooks/plan-gate.sh
+F=fixtures/plan-gate
+expect_reason 2 "no discipline sections at all"      "missing 'Assumption Ledger'" \
+  $G $F/must-fail/01-missing-sections.md
+expect_reason 2 "describes the section, never opens it" "HEADING" \
+  $G $F/must-fail/02-describes-without-heading.md
+expect_reason 2 "an open probe survives into impl"   "OPEN [NEEDS PROBE] row(s)" \
+  $G $F/must-fail/03-open-probe.md
+expect_reason 2 "a multiplier with no direct timing" "Measured-basis" \
+  $G $F/must-fail/04-unsourced-multiplier.md
+expect 0 "complete plan passes (resolved probe, hex)" $G $F/must-pass/01-complete.md
+expect 0 "a lower tier is not argued with"           $G $F/must-pass/02-lower-tier.md
+
+echo
+echo "migration-guard calibration"
+M=plugin/hooks/migration-guard.sh
+MP=fixtures/migration-guard/project
+expect_payload 2 "up without a down"              "is missing"  $M $MP/migrations/0001_orders.up.sql   $MP
+expect_payload 2 "table lacks the required column" "required column" $M $MP/migrations/0002_events.up.sql $MP
+expect_payload 2 "column present, no row security" "ENABLE ROW LEVEL SECURITY" $M $MP/migrations/0003_notes.up.sql $MP
+expect_payload 0 "compliant table passes"          -            $M $MP/migrations/0004_invoices.up.sql $MP
+expect_payload 0 "exemption WITH a reason passes"  -            $M $MP/migrations/0005_catalog.up.sql  $MP
+expect_payload 2 "exemption WITHOUT a reason is not one" "required column" $M $MP/migrations/0006_widgets.up.sql $MP
+
+echo
+echo "post-edit-lint calibration"
+E=plugin/hooks/post-edit-lint.sh
+expect_payload 2 "a syntax error is fed back"      "check failed" $E fixtures/post-edit-lint/broken.py
+expect_payload 0 "valid source is silent"          -              $E fixtures/post-edit-lint/valid.py
 
 echo
 echo "repository scan"

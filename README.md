@@ -3,8 +3,8 @@
 *A cairn is a stack of stones left on a trail so the next traveller does not get
 lost. This repository is the same idea for engineering with Claude Code.*
 
-**Status: early. F0 (the leak gate) is the only finished piece.** See the
-roadmap below before expecting to install anything.
+**Status: early. F0 (the leak gate) and F2 (the hooks) are done.** The rules,
+the knowledge linter and the installer are not. See the roadmap.
 
 ## What this is
 
@@ -31,16 +31,21 @@ Not an agent collection, not a prompt megapack, not a wrapper around Claude
 Code. If you want breadth, the ecosystem has excellent collections already. Cairn
 is narrow on purpose.
 
-## Try the one piece that exists
+## Try what exists
 
 ```sh
 git clone <this repo> && cd cairn
 make verify
 ```
 
-You should see the leak scanner reject the deliberately dirty fixture, accept
-the deliberately tricky clean one, prove that all 14 of its patterns actually
-fire, and then pass over the repository itself.
+Eighteen assertions run, and they are the argument this repository is making.
+The plan gate must reject a plan that *describes* the section it is asked to
+open, and must accept one whose resolved probe row quotes the marker while
+answering it. The migration guard must reject an exemption written without a
+reason. The leak scanner must prove that every one of its patterns actually
+fires, because two of them once could not match anything at all.
+
+Wiring the hooks into a project is described in `plugin/hooks/README.md`.
 
 ## Roadmap
 
@@ -48,7 +53,7 @@ fire, and then pass over the repository itself.
 |---|---|---|
 | F0 | leak gate + calibration harness + CI | **done** |
 | F1 | 6 portable rules | next |
-| F2 | 5 hooks + plan-gate fixtures | |
+| F2 | 5 hooks + calibration fixtures | **done** |
 | F3 | knowledge-base linter + note schema | |
 | F4 | doc skeleton, templates, 4 general prompts | |
 | F4.5 | `web3` sector pack (chain E2E, indexer unit economics, RPC cost) | |

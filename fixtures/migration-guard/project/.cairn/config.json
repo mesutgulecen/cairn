@@ -1,0 +1,8 @@
+{
+  "hooks": {
+    "migration_guard": {
+      "required_column": "tenant_id uuid NOT NULL",
+      "require_rls": true
+    }
+  }
+}
