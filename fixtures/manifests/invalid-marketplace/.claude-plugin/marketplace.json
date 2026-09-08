@@ -1,6 +1,0 @@
-{
-  "name": "broken",
-  "plugins": [
-    { "name": "broken", "source": "./does-not-exist" }
-  ]
-}

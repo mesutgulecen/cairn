@@ -21,7 +21,7 @@ guard: it buys confidence and delivers nothing.
 
 ## Writing a rule
 
-Rules live in `plugin/rules/`. A rule opens with the measurement that produced
+Rules live in `components/rules/`. A rule opens with the measurement that produced
 it, whether a window or a ratio or a count, then states what makes the failure invisible,
 then gives three to five questions to ask before writing the code. Anonymise
 freely; keep the number.

@@ -49,5 +49,5 @@ which immediately found two patterns that could not match anything at all.
 
 `CONTRIBUTING.md` states the rule plainly: a guard is not accepted without a
 failing fixture. The calibration history stays in the comments of
-`plugin/hooks/plan-gate.sh`, because in this repository that history is the
+`components/hooks/plan-gate.sh`, because in this repository that history is the
 product.

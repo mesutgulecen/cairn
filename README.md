@@ -39,11 +39,10 @@ migration-guard calibration     4 rejected · 2 accepted
 post-edit-lint calibration      broken source fed back · valid source silent
 knowledge-lint calibration      one of each decay mode found · forward link tolerated
 installer calibration           dry run writes nothing · idempotent · brownfield · preserves
-manifest calibration            missing owner rejected · missing path rejected
 hostile config                  nothing executes · the session still starts
 history scan                    no secret in any blob any commit ever held
 link check calibration          renamed target caught · code fences ignored
-40 passed, 0 failed
+39 passed, 0 failed
 ```
 
 Several of those assertions exist because the thing they check was, at some
@@ -94,25 +93,17 @@ Three incidents, anonymised, with the numbers left in:
    "13 accounts have no restriction", from a query against one of the two
    tables that hold that setting.
 
-## Two install paths, and why the installer is the primary one
+## One way in
 
-**`rules/` is not a plugin component.** Project rules load from the workspace's
-`.claude/rules/`, so a plugin install delivers commands, hooks and skills, and
-none of the rules, prompt packs, templates or the knowledge linter. That is not a
-packaging oversight; it is what the plugin system supports. The installer
-delivers everything, which is why it is the documented path.
+There is a single install path, `install/install.sh`, and it is the one the
+tests cover. An earlier version also shipped Claude Code plugin manifests; they
+were removed, because a plugin install delivers commands, hooks and skills and
+**not** rules, prompt packs, templates or the knowledge linter. `rules/` is not
+a plugin component: project rules load from the workspace's `.claude/rules/`.
 
-| | plugin install | `install/install.sh` |
-|---|---|---|
-| commands, hooks, skills | yes | yes |
-| rules (6 core + pack rules) | **no** | yes |
-| prompt packs, templates, docs skeleton, knowledge linter | **no** | yes |
-
-The manifests are validated against the documented schema by `make verify`
-(checked against the official reference on 2026-09-08, including that every path
-they name exists). What has **not** happened is a real `/plugin marketplace add`
-run. That is a user action, and until someone performs it the end-to-end plugin
-path is unproven. Recorded here rather than assumed to work.
+That is a partial install that looks like a complete one, and nothing in it says
+so. Shipping a second, untested path with that property would contradict the
+point of the repository, so it is gone.
 
 ## Trust model
 

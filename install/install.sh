@@ -68,7 +68,7 @@ echo "cairn → $TARGET"
 echo
 
 echo "rules"
-for f in "$SRC"/plugin/rules/*.md; do
+for f in "$SRC"/components/rules/*.md; do
   b="$(basename "$f")"; [ "$b" = "README.md" ] && continue
   case "$RULES" in
     all) ;;
@@ -79,20 +79,20 @@ done
 
 echo
 echo "hooks"
-for f in "$SRC"/plugin/hooks/*.sh; do copy_file "$f" ".claude/hooks/$(basename "$f")"; done
-copy_file "$SRC/plugin/hooks/lib/common.sh" ".claude/hooks/lib/common.sh"
-for f in "$SRC"/plugin/hooks/adapters/*.sh; do copy_file "$f" ".claude/hooks/adapters/$(basename "$f")"; done
+for f in "$SRC"/components/hooks/*.sh; do copy_file "$f" ".claude/hooks/$(basename "$f")"; done
+copy_file "$SRC/components/hooks/lib/common.sh" ".claude/hooks/lib/common.sh"
+for f in "$SRC"/components/hooks/adapters/*.sh; do copy_file "$f" ".claude/hooks/adapters/$(basename "$f")"; done
 
 echo
 echo "commands"
-for f in "$SRC"/plugin/commands/*.md; do
+for f in "$SRC"/components/commands/*.md; do
   b="$(basename "$f")"; [ "$b" = "README.md" ] && continue
   copy_file "$f" ".claude/commands/$b"
 done
 
 echo
 echo "skills"
-for d in "$SRC"/plugin/skills/*/; do
+for d in "$SRC"/components/skills/*/; do
   name="$(basename "$d")"
   [ -f "$d/SKILL.md" ] || continue
   copy_file "$d/SKILL.md" ".claude/skills/$name/SKILL.md"
@@ -168,7 +168,7 @@ if [ "$DO_SETTINGS" -eq 1 ]; then
   echo "harness settings"
   if [ "$APPLY" -eq 1 ]; then
     python3 "$SRC/install/merge_settings.py" \
-      "$TARGET/.claude/settings.json" "$SRC/plugin/hooks/hooks.settings.json"
+      "$TARGET/.claude/settings.json" "$SRC/components/hooks/hooks.settings.json"
   else
     say "would" ".claude/settings.json (merge hook entries, backup first)"
   fi

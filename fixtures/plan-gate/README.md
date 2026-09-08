@@ -1,4 +1,4 @@
-# Calibration fixtures for `plugin/hooks/plan-gate.sh`
+# Calibration fixtures for `components/hooks/plan-gate.sh`
 
 Four documents the gate MUST reject and two it MUST accept. `scripts/verify.sh`
 asserts the exit code *and the reason*: a guard that rejects the right document

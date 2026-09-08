@@ -45,7 +45,7 @@ that matched nothing. Two surfaces, opposite readings, one column.
 
 ## What stops it now
 
-`plugin/rules/the-second-instance.md` carries both halves: the variant split in
+`components/rules/the-second-instance.md` carries both halves: the variant split in
 code, and the same split in queries and rendering paths. Three habits from it:
 
 1. **Enumerate the kinds first.** Different kinds store the "same" setting in

@@ -1,4 +1,4 @@
-# Calibration fixtures for `plugin/hooks/migration-guard.sh`
+# Calibration fixtures for `components/hooks/migration-guard.sh`
 
 `project/` is a miniature repository: a `.cairn/config.json` that switches on the
 configured invariants, and five migrations covering one case each.

@@ -105,7 +105,7 @@ fi
 
 echo
 echo "plan-gate calibration"
-G=plugin/hooks/plan-gate.sh
+G=components/hooks/plan-gate.sh
 F=fixtures/plan-gate
 expect_reason 2 "no discipline sections at all"      "missing 'Assumption Ledger'" \
   $G $F/must-fail/01-missing-sections.md
@@ -124,7 +124,7 @@ expect 0 "the shipped plan template passes the gate" $G install/templates/templa
 
 echo
 echo "migration-guard calibration"
-M=plugin/hooks/migration-guard.sh
+M=components/hooks/migration-guard.sh
 MP=fixtures/migration-guard/project
 expect_payload 2 "up without a down"              "is missing"  $M $MP/migrations/0001_orders.up.sql   $MP
 expect_payload 2 "table lacks the required column" "required column" $M $MP/migrations/0002_events.up.sql $MP
@@ -135,7 +135,7 @@ expect_payload 2 "exemption WITHOUT a reason is not one" "required column" $M $M
 
 echo
 echo "post-edit-lint calibration"
-E=plugin/hooks/post-edit-lint.sh
+E=components/hooks/post-edit-lint.sh
 expect_payload 2 "a syntax error is fed back"      "check failed" $E fixtures/post-edit-lint/broken.py
 expect_payload 0 "valid source is silent"          -              $E fixtures/post-edit-lint/valid.py
 
@@ -163,18 +163,6 @@ expect 0 "a project with its own files keeps them" scripts/test-install.sh brown
 expect 0 "a hostile config executes nothing"     scripts/test-install.sh hostile-config
 expect 0 "a second run duplicates no hooks"      scripts/test-install.sh idempotent
 expect 0 "existing settings and guide survive"   scripts/test-install.sh preserves
-expect_reason 1 "a manifest missing owner is rejected" "owner" \
-  scripts/check-manifests.py fixtures/manifests/invalid-marketplace/.claude-plugin/marketplace.json
-expect_reason 1 "a manifest naming a missing path fails" "does not exist" \
-  scripts/check-manifests.py fixtures/manifests/invalid-plugin/.claude-plugin/plugin.json
-expect 0 "shipped manifests match the documented schema" scripts/check-manifests.py
-expect 0 "shipped manifests are valid JSON"      python3 -c "
-import json,pathlib
-for p in ['.claude-plugin/marketplace.json','plugin/.claude-plugin/plugin.json',
-          'plugin/hooks/hooks.json','plugin/hooks/hooks.settings.json']:
-    json.loads(pathlib.Path(p).read_text())
-"
-
 echo
 echo "link check calibration"
 expect_reason 1 "a renamed target is caught" "old-name.md" scripts/check-links.py fixtures/links/broken
@@ -191,6 +179,22 @@ if [ -f .local/sanitize-deny.txt ]; then
   expect 0 "repo is clean (incl. local deny list)" scripts/sanitize-check.sh --deny .local/sanitize-deny.txt
 else
   expect 0 "repo is clean"              scripts/sanitize-check.sh
+fi
+
+# The README quotes this harness's output. A number typed into prose goes stale
+# the moment an assertion is added, and a stale number in the first screen of a
+# README is the kind of small wrong thing that makes a reader doubt the large
+# right ones. So the claim is checked against the run.
+# +1 for this check itself, so the number the README quotes is the number a
+# reader will actually see printed at the end of the run.
+total=$((pass + fail + 1))
+claimed=$(grep -oE '^[0-9]+ passed, [0-9]+ failed' README.md 2>/dev/null | head -1 | cut -d' ' -f1)
+if [ -n "$claimed" ] && [ "$claimed" != "$total" ]; then
+  printf '  FAIL %-44s README says %s, harness ran %d\n' "README quotes the real assertion count" "$claimed" "$total"
+  fail=$((fail + 1))
+else
+  printf '  ok   %-44s %d\n' "README quotes the real assertion count" "$total"
+  pass=$((pass + 1))
 fi
 
 echo

@@ -40,7 +40,7 @@ anyone noticing the reasoning was wrong.
 
 ## What stops it now
 
-`plugin/rules/measurement-discipline.md` §1.1: compare against the baseline's
+`components/rules/measurement-discipline.md` §1.1: compare against the baseline's
 **range**, not its median, and say whether the new reading falls inside it. State
 the window, and make it long enough to contain the system's slow phases.
 
