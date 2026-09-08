@@ -124,6 +124,21 @@ E=plugin/hooks/post-edit-lint.sh
 expect_payload 2 "a syntax error is fed back"      "check failed" $E fixtures/post-edit-lint/broken.py
 expect_payload 0 "valid source is silent"          -              $E fixtures/post-edit-lint/valid.py
 
+# Four silent failure modes, four assertions. The drifted corpus carries exactly
+# one of each, so a detector that stops working shows up as a count, not as a
+# vague "still fails".
+echo
+echo "knowledge-lint calibration"
+K=knowledge/knowledge_lint.py
+kb() { $K --index "fixtures/knowledge/$1/notes" --corpus "fixtures/knowledge/$1/notes" \
+             --entry "fixtures/knowledge/$1/notes/MEMORY.md" --check --quiet "${@:2}"; }
+expect        0 "a healthy corpus passes"              kb clean
+expect_reason 1 "link drift is found"     "1 fixable"           kb drifted --index-budget 200
+expect_reason 1 "schema drift is found"   "schema     1"        kb drifted --index-budget 200
+expect_reason 1 "an unreachable note is found" "1 unreachable"  kb drifted --index-budget 200
+expect_reason 1 "an over-budget index is found" "OVER"          kb drifted --index-budget 200
+expect        0 "a dangling forward link does NOT fail" kb forward-link
+
 echo
 echo "repository scan"
 expect 0 "repo is clean"              scripts/sanitize-check.sh

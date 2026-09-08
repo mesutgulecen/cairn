@@ -1,0 +1,2 @@
+- **Working agreements** · [name the column](feedback_name_the_column.md)
+- **To write** · [[reference_the_note_nobody_wrote_yet]]

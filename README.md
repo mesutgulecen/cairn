@@ -3,8 +3,8 @@
 *A cairn is a stack of stones left on a trail so the next traveller does not get
 lost. This repository is the same idea for engineering with Claude Code.*
 
-**Status: early. The rules, the hooks and the leak gate are done.** The
-knowledge linter, the prompt packs and the installer are not. See the roadmap.
+**Status: early. The rules, the hooks, the knowledge linter and the leak gate
+are done.** The prompt packs and the installer are not. See the roadmap.
 
 ## What this is
 
@@ -38,12 +38,14 @@ git clone <this repo> && cd cairn
 make verify
 ```
 
-Eighteen assertions run, and they are the argument this repository is making.
+Twenty-four assertions run, and they are the argument this repository is making.
 The plan gate must reject a plan that *describes* the section it is asked to
 open, and must accept one whose resolved probe row quotes the marker while
 answering it. The migration guard must reject an exemption written without a
 reason. The leak scanner must prove that every one of its patterns actually
-fires, because two of them once could not match anything at all.
+fires, because two of them once could not match anything at all. The knowledge
+linter must find exactly one of each decay mode in a corpus seeded with one of
+each — and must NOT fail on a link to a note that has not been written yet.
 
 Wiring the hooks into a project is described in `plugin/hooks/README.md`.
 
@@ -54,8 +56,8 @@ Wiring the hooks into a project is described in `plugin/hooks/README.md`.
 | F0 | leak gate + calibration harness + CI | **done** |
 | F1 | 6 portable rules | **done** |
 | F2 | 5 hooks + calibration fixtures | **done** |
-| F3 | knowledge-base linter + note schema | next |
-| F4 | doc skeleton, templates, 4 general prompts | |
+| F3 | knowledge-base linter + note schema | **done** |
+| F4 | doc skeleton, templates, 4 general prompts | next |
 | F4.5 | `web3` sector pack (chain E2E, indexer unit economics, RPC cost) | |
 | F5 | Claude Code plugin + installer | |
 | F6 | anonymised case studies | |
