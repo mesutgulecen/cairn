@@ -3,8 +3,8 @@
 *A cairn is a stack of stones left on a trail so the next traveller does not get
 lost. This repository is the same idea for engineering with Claude Code.*
 
-**Status: early. F0 (the leak gate) and F2 (the hooks) are done.** The rules,
-the knowledge linter and the installer are not. See the roadmap.
+**Status: early. The rules, the hooks and the leak gate are done.** The
+knowledge linter, the prompt packs and the installer are not. See the roadmap.
 
 ## What this is
 
@@ -52,9 +52,9 @@ Wiring the hooks into a project is described in `plugin/hooks/README.md`.
 | Phase | Contents | Status |
 |---|---|---|
 | F0 | leak gate + calibration harness + CI | **done** |
-| F1 | 6 portable rules | next |
+| F1 | 6 portable rules | **done** |
 | F2 | 5 hooks + calibration fixtures | **done** |
-| F3 | knowledge-base linter + note schema | |
+| F3 | knowledge-base linter + note schema | next |
 | F4 | doc skeleton, templates, 4 general prompts | |
 | F4.5 | `web3` sector pack (chain E2E, indexer unit economics, RPC cost) | |
 | F5 | Claude Code plugin + installer | |
