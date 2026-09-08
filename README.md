@@ -9,7 +9,7 @@ mechanisms that decided, across two production codebases, whether an AI-assisted
 change was correct or merely plausible.
 
 ```sh
-git clone <this repo> && cd cairn
+git clone https://github.com/mesutgulecen/cairn && cd cairn
 ./install/install.sh --target /path/to/your/project              # dry run
 ./install/install.sh --target /path/to/your/project --apply
 ./install/install.sh --target /path/to/your/project --packs general,web3,security --apply

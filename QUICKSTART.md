@@ -7,7 +7,7 @@ already have.
 ## 0 · Look before you install (1 min)
 
 ```sh
-git clone https://github.com/OWNER/cairn && cd cairn
+git clone https://github.com/mesutgulecen/cairn && cd cairn
 ./install/install.sh --target ~/projects/myapp
 ```
 

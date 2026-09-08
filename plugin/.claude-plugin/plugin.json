@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "description": "Plan discipline, edit-time guards and knowledge-base health for Claude Code.",
   "license": "MIT",
-  "homepage": "https://github.com/OWNER/cairn",
-  "repository": "https://github.com/OWNER/cairn",
+  "homepage": "https://github.com/mesutgulecen/cairn",
+  "repository": "https://github.com/mesutgulecen/cairn",
   "keywords": ["discipline", "hooks", "audit", "planning", "knowledge-base"],
   "hooks": "./hooks/hooks.json"
 }
