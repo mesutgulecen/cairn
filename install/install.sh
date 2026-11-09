@@ -16,7 +16,12 @@
 #
 # Usage:
 #   install/install.sh [--apply] [--target DIR] [--packs a,b] [--rules a,b|all]
-#                      [--force] [--no-settings]
+#                      [--force] [--no-settings] [--token-defaults]
+#
+#   --token-defaults  OPT-IN. Also writes a cheaper-session baseline into
+#                     .claude/settings.json (model, subagent model, compaction
+#                     window). Personal preference, so never the default, and
+#                     it never overrides a value the project already set.
 set -uo pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -24,6 +29,7 @@ TARGET="$PWD"
 APPLY=0
 FORCE=0
 DO_SETTINGS=1
+TOKEN_DEFAULTS=0
 PACKS="general"
 RULES="all"
 
@@ -32,6 +38,7 @@ while [ $# -gt 0 ]; do
     --apply) APPLY=1 ;;
     --force) FORCE=1 ;;
     --no-settings) DO_SETTINGS=0 ;;
+    --token-defaults) TOKEN_DEFAULTS=1 ;;
     --target) TARGET="$2"; shift ;;
     --packs) PACKS="$2"; shift ;;
     --rules) RULES="$2"; shift ;;
@@ -82,6 +89,10 @@ echo "hooks"
 for f in "$SRC"/components/hooks/*.sh; do copy_file "$f" ".claude/hooks/$(basename "$f")"; done
 copy_file "$SRC/components/hooks/lib/common.sh" ".claude/hooks/lib/common.sh"
 for f in "$SRC"/components/hooks/adapters/*.sh; do copy_file "$f" ".claude/hooks/adapters/$(basename "$f")"; done
+
+echo
+echo "bin"
+copy_file "$SRC/components/bin/q.sh" ".claude/bin/q.sh"
 
 echo
 echo "commands"
@@ -167,10 +178,13 @@ if [ "$DO_SETTINGS" -eq 1 ]; then
   echo
   echo "harness settings"
   if [ "$APPLY" -eq 1 ]; then
+    extra=()
+    [ "$TOKEN_DEFAULTS" -eq 1 ] && extra=("$SRC/components/settings/token-defaults.settings.json")
     python3 "$SRC/install/merge_settings.py" \
-      "$TARGET/.claude/settings.json" "$SRC/components/hooks/hooks.settings.json"
+      "$TARGET/.claude/settings.json" "$SRC/components/hooks/hooks.settings.json" ${extra[@]+"${extra[@]}"}
   else
     say "would" ".claude/settings.json (merge hook entries, backup first)"
+    [ "$TOKEN_DEFAULTS" -eq 1 ] && say "would" ".claude/settings.json (token defaults: only keys not already set)"
   fi
 fi
 

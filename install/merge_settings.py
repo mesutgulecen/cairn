@@ -26,6 +26,10 @@ def commands(entry: dict) -> set[str]:
 def main() -> int:
     dest, src = Path(sys.argv[1]), Path(sys.argv[2])
     incoming = json.loads(src.read_text(encoding="utf-8"))["hooks"]
+    # Optional third argument: a baseline of plain settings (model, env). Applied
+    # fill-in-only: a key the project already set is NEVER overwritten.
+    defaults = (json.loads(Path(sys.argv[3]).read_text(encoding="utf-8"))
+                if len(sys.argv) > 3 else {})
 
     existing: dict = {}
     if dest.is_file():
@@ -56,6 +60,18 @@ def main() -> int:
             merged["hooks"] = new
             current.append(merged)
             added += len(new)
+
+    set_keys = []
+    for key, value in defaults.items():
+        if key == "env" and isinstance(value, dict):
+            env = existing.setdefault("env", {})
+            for k, v in value.items():
+                if k not in env:
+                    env[k] = v
+                    set_keys.append(f"env.{k}")
+        elif key not in existing:
+            existing[key] = value
+            set_keys.append(key)
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(json.dumps(existing, indent=2) + "\n", encoding="utf-8")

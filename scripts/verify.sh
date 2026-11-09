@@ -163,6 +163,22 @@ expect 0 "a project with its own files keeps them" scripts/test-install.sh brown
 expect 0 "a hostile config executes nothing"     scripts/test-install.sh hostile-config
 expect 0 "a second run duplicates no hooks"      scripts/test-install.sh idempotent
 expect 0 "existing settings and guide survive"   scripts/test-install.sh preserves
+expect 0 "token defaults are opt-in, fill-only"  scripts/test-install.sh token-defaults
+echo
+echo "q.sh calibration"
+expect 0 "the wrapped exit code is passed through" scripts/test-qsh.sh rc-passthrough
+expect 0 "a buried failure line is surfaced"       scripts/test-qsh.sh surfaces-fail
+expect 0 "a 500-line log is bounded, kept in full" scripts/test-qsh.sh truncates
+expect 0 "a clean run reports no failure section"  scripts/test-qsh.sh quiet-success
+expect 0 "no command is a usage error"             scripts/test-qsh.sh empty-command
+echo
+echo "context budget calibration"
+expect 0 "an oversized guide is flagged"           scripts/test-budget.sh bloated-guide
+expect 0 "a lean guide is not"                     scripts/test-budget.sh lean-guide
+expect 0 "always-on rules over budget are flagged" scripts/test-budget.sh always-on-rules
+expect 0 "the same bytes path-scoped are not"      scripts/test-budget.sh scoped-rules
+expect 0 "a configured budget silences it"         scripts/test-budget.sh config-override
+expect 0 "a hostile budget value executes nothing" scripts/test-budget.sh hostile-budget
 echo
 echo "link check calibration"
 expect_reason 1 "a renamed target is caught" "old-name.md" scripts/check-links.py fixtures/links/broken

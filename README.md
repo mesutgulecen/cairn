@@ -38,11 +38,13 @@ plan-gate calibration           4 rejected for the right reason · 3 accepted
 migration-guard calibration     4 rejected · 2 accepted
 post-edit-lint calibration      broken source fed back · valid source silent
 knowledge-lint calibration      one of each decay mode found · forward link tolerated
-installer calibration           dry run writes nothing · idempotent · brownfield · preserves
+installer calibration           dry run writes nothing · idempotent · brownfield · preserves · opt-in token defaults
+q.sh calibration                exit code passed through · buried failure surfaced · long log bounded but kept
+context budget calibration      bloated guide flagged · lean guide not · scoped rules not counted
 hostile config                  nothing executes · the session still starts
 history scan                    no secret in any blob any commit ever held
 link check calibration          renamed target caught · code fences ignored
-39 passed, 0 failed
+51 passed, 0 failed
 ```
 
 Several of those assertions exist because the thing they check was, at some
@@ -55,12 +57,17 @@ match anything at all. The plan gate had a check that was dead from the day
 | | |
 |---|---|
 | **6 rules** | injected at edit time by path. Each opens with the measurement that produced it, a window or a ratio or a count, because a rule that says "measure carefully" is advice, and one that says "1.49x over 25 minutes was 1.043x over 9.32 hours" changes behaviour. |
-| **5 hooks** | three that block (plan discipline, edit-time compile, migration invariants) and two that advise (session continuity, config drift). |
+| **5 hooks** | three that block (plan discipline, edit-time compile, migration invariants) and two that advise (session continuity + a context-budget warning, config drift). |
 | **3 skills** | `plan-authoring`, `audit-authoring`, `memory-notes`: the judgement behind the three things this repo asks you to write. Frontend/motion skills are deliberately not vendored; the README points upstream instead. |
+| **`q.sh`** | `.claude/bin/q.sh <label> -- <command>`: runs a noisy command, keeps the full output in a file, and gives the conversation only the exit code, the failure lines and the tail. Raw build and test output is the largest avoidable context cost. |
 | **7 commands** | `/plan-new` `/plan-gate` `/kb-lint` `/deploy-verify` `/incident` `/regression-sweep` `/code-review` |
 | **A knowledge linter** | four silent decay modes (link drift, unreachable notes, schema drift, an index over its per-session token budget) turned into build output. |
 | **Templates** | plan (tiered, with the discipline gates as sections), incident, audit, and a commit convention. Plus a router-style `CLAUDE.md`. |
 | **Prompt packs** | `general` (code review, deploy verification, post-mortem, regression sweep), `web3` (chain E2E, indexer unit economics, RPC cost, order latency), `security` (application audit, server hardening, dependency drift). |
+
+### Cheaper sessions
+
+Three things keep a session's cost down and all three are calibrated like the guards: `q.sh` (above); a **budget warning** at session start when `CLAUDE.md` passes 15 KB or the always-on rules pass 20 KB (thresholds in `.cairn/config.json`); and the token-budget items in `session-hygiene.md`. An opt-in `--token-defaults` flag also writes a model / subagent-model / compaction-window baseline into `.claude/settings.json`. It is a personal preference, so it is never the default, and it never overrides a value the project already set.
 
 ## What this is not
 

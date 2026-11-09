@@ -11,6 +11,15 @@ session. Every paragraph here is a paragraph you pay for whether or not it is
 relevant to the task at hand, and a long guide is skimmed rather than read.
 Aim for a page. A second page needs a reason.
 
+**Budget: about 10 KB.** The `session-start` hook warns past 15 KB
+(`hooks.session_start.claude_md_max_bytes` in `.cairn/config.json`). The usual
+way a guide bloats is dated status paragraphs and "what we measured on day X"
+stories. Those are history: move them to `docs/CHANGELOG-internal.md` and leave
+one line here that links to it. Keep only what an agent needs on every task.
+
+**Long commands:** run builds, tests and linters through
+`.claude/bin/q.sh <label> -- <command>` so only a digest enters the conversation.
+
 ## Doc map
 
 Read the relevant document **before** working in that area — the section you

@@ -27,7 +27,7 @@ paths:
 ---
 ```
 
-**These six rules are 26 KB together.** That is a fixed context cost every time
+**These six rules are 25 KB together** (`session-hygiene.md` grew once the token-budget items were added). That is a fixed context cost every time
 they all match, and `measurement-discipline.md` alone is a third of it. The
 budget is the reason `paths` exists, not tidiness.
 

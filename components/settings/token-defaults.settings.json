@@ -1,0 +1,7 @@
+{
+  "model": "sonnet",
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "haiku",
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "400000"
+  }
+}

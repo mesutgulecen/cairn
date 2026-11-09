@@ -34,7 +34,7 @@ fresh)
 
   for p in .claude/hooks/plan-gate.sh .claude/hooks/lib/common.sh \
            .claude/hooks/adapters/python.sh .claude/commands/plan-gate.md \
-           .claude/rules/fix-discipline.md knowledge/knowledge_lint.py \
+           .claude/rules/fix-discipline.md knowledge/knowledge_lint.py .claude/bin/q.sh \
            .claude/skills/plan-authoring/SKILL.md \
            .claude/skills/audit-authoring/SKILL.md \
            .claude/skills/memory-notes/SKILL.md \
@@ -44,6 +44,9 @@ fresh)
     have "$t" "$p" || { rm -rf "$t"; exit 1; }
   done
   [ -x "$t/.claude/hooks/plan-gate.sh" ] || { rm -rf "$t"; fail "hooks are not executable"; }
+  [ -x "$t/.claude/bin/q.sh" ] || { rm -rf "$t"; fail "q.sh is not executable after install"; }
+  # The default install must NOT carry personal model preferences.
+  grep -q '"model"' "$t/.claude/settings.json" && { rm -rf "$t"; fail "default install wrote a model preference — token defaults must be opt-in"; }
 
   rules=$(find "$t/.claude/rules" -name '*.md' | wc -l | tr -d ' ')
   [ "$rules" -eq 6 ] || { rm -rf "$t"; fail "expected 6 rules, found $rules"; }
@@ -194,6 +197,29 @@ JSON
   rm -rf "$t"
   ;;
 
-*) echo "usage: test-install.sh <dry-run|fresh|packs|brownfield|hostile-config|idempotent|preserves>" >&2; exit 2 ;;
+token-defaults)
+  # Opt-in baseline: written when asked, never when not asked, and NEVER over a
+  # value the project already chose.
+  t=$(mktemp -d); mkdir -p "$t/.claude"
+  echo '{ "model": "opus", "env": { "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "250000", "KEEP_ME": "1" } }' > "$t/.claude/settings.json"
+  "$SRC/install/install.sh" --apply --target "$t" --token-defaults >/dev/null 2>&1; rc=$?
+  [ "$rc" -eq 0 ] || { rm -rf "$t"; fail "install exited $rc"; }
+  m=$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d.get("model"), d["env"].get("CLAUDE_CODE_AUTO_COMPACT_WINDOW"), d["env"].get("CLAUDE_CODE_SUBAGENT_MODEL"), d["env"].get("KEEP_ME"))' "$t/.claude/settings.json")
+  rm -rf "$t"
+  [ "$m" = "opus 250000 haiku 1" ] || fail "expected the project's own model/window kept and the missing subagent key filled; got: $m"
+
+  # A fresh project asked for the baseline gets all of it.
+  t=$(mktemp -d)
+  "$SRC/install/install.sh" --apply --target "$t" --token-defaults >/dev/null 2>&1
+  m=$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d.get("model"), d["env"].get("CLAUDE_CODE_AUTO_COMPACT_WINDOW"), d["env"].get("CLAUDE_CODE_SUBAGENT_MODEL"))' "$t/.claude/settings.json")
+  before=$(grep -c '"command"' "$t/.claude/settings.json")
+  "$SRC/install/install.sh" --apply --target "$t" --token-defaults >/dev/null 2>&1
+  after=$(grep -c '"command"' "$t/.claude/settings.json")
+  rm -rf "$t"
+  [ "$m" = "sonnet 400000 haiku" ] || fail "fresh --token-defaults wrote: $m"
+  [ "$before" -gt 0 ] && [ "$before" -eq "$after" ] || fail "a second run changed the hooks: $before -> $after"
+  ;;
+
+*) echo "usage: test-install.sh <dry-run|fresh|packs|brownfield|hostile-config|idempotent|preserves|token-defaults>" >&2; exit 2 ;;
 esac
 exit 0

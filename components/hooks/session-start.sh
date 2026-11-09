@@ -55,9 +55,43 @@ if [ "$kb_tool" = "knowledge_lint" ] && [ -f "$kb_path" ]; then
   kb=$(python3 "$kb_path" --quiet 2>/dev/null || true)
 fi
 
+
+# Context budget advisory. Two things are loaded into EVERY session whether or not
+# the task needs them: the project guide, and every rule whose `paths` is "**" (or
+# absent). Both grow silently — nobody decides to make CLAUDE.md 69 KB, it
+# accretes one dated paragraph at a time — and every turn pays for the whole of it.
+# This only ADVISES (exit 0, text in the context); the numbers are heuristics
+# from a measured case (a 69 KB guide ≈ 30k tokens), tunable in .cairn/config.json.
+NUM_RE='[0-9]{3,7}'
+guide_max="$(cairn_config_safe hooks.session_start.claude_md_max_bytes 15000 "$NUM_RE")"
+rules_max="$(cairn_config_safe hooks.session_start.rules_always_on_max_bytes 20000 "$NUM_RE")"
+budget=""
+if [ -f CLAUDE.md ]; then
+  gb=$(wc -c < CLAUDE.md | tr -d ' ')
+  [ "$gb" -gt "$guide_max" ] && budget="CLAUDE.md is ${gb} bytes (budget ${guide_max}). It is loaded every session: move dated backstory and measurement narratives to a history file and keep the guide a router."
+fi
+if [ -d .claude/rules ]; then
+  rb=0
+  for rf in .claude/rules/*.md; do
+    [ -f "$rf" ] || continue
+    # Always-on = no `paths:` in the front matter, or a `**` entry in it.
+    always=$(awk '
+      NR==1 && $0!="---" { print "yes"; exit }
+      NR>1 && $0=="---"  { print (haspaths && !star) ? "no" : "yes"; exit }
+      /^paths:/          { haspaths=1 }
+      /^[[:space:]]*-[[:space:]]*["'"'"']?\*\*["'"'"']?[[:space:]]*$/ { star=1 }
+    ' "$rf")
+    [ "$always" = "yes" ] && rb=$((rb + $(wc -c < "$rf" | tr -d ' ')))
+  done
+  if [ "$rb" -gt "$rules_max" ]; then
+    budget="${budget:+$budget }Rules that load on every edit (paths \"**\" or none) total ${rb} bytes (budget ${rules_max}): narrow each rule's paths to the code its failure lives in."
+  fi
+fi
+
 ctx="## Session continuity"$'\n\n'"### Recent commits"$'\n'"${recent:-(none)}"
 [ -n "$prog" ] && ctx="${ctx}"$'\n\n'"### Active plan: ${prog}"$'\n'"${proghead}"
 [ -n "${kb// }" ] && ctx="${ctx}"$'\n\n'"### Knowledge base"$'\n'"${kb}"
+[ -n "$budget" ] && ctx="${ctx}"$'\n\n'"### Context budget"$'\n'"${budget}"
 
 cairn_emit_context "SessionStart" "$ctx"
 exit 0
