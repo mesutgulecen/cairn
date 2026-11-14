@@ -163,7 +163,8 @@ else
     "session_start": {
       "progress_glob": "docs/plans/*/*-progress.md",
       "plans_glob": "docs/plans/*/*.md",
-      "kb_command": "knowledge/knowledge_lint.py --quiet"
+      "kb_tool": "knowledge_lint",
+      "kb_path": "knowledge/knowledge_lint.py"
     },
     "post_edit": { "enabled": true, "timeout_seconds": 60 },
     "env_drift": { "config_file": "config", "deployment_target": "the deployed environment file" },

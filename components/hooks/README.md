@@ -42,7 +42,8 @@ default: configuration is an override, never a precondition.
     "session_start": {
       "progress_glob": "docs/plans/*/*-progress.md",
       "plans_glob": "docs/plans/*/*.md",
-      "kb_command": "knowledge/knowledge_lint.py --quiet"
+      "kb_tool": "knowledge_lint",
+      "kb_path": "knowledge/knowledge_lint.py"
     },
     "plan_gate": {
       "tier_pattern": "Tier:[^A-Za-z0-9]*K2",

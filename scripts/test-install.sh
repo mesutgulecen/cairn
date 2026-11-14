@@ -54,6 +54,11 @@ fresh)
   grep -q 'session-start.sh' "$t/.claude/settings.json" \
     || { rm -rf "$t"; fail "settings.json has no hook entries"; }
 
+  # The config the installer writes must not use a key the hook has removed.
+  # Such a key made every fresh install warn at every session start.
+  warn=$( ( cd "$t" && echo '{}' | CLAUDE_PROJECT_DIR="$t" ./.claude/hooks/session-start.sh ) 2>&1 >/dev/null )
+  [ -z "$warn" ] || { rm -rf "$t"; fail "installed session-start hook warns on a fresh install: $warn"; }
+
   # End to end: the INSTALLED gate must accept the INSTALLED template. Checking
   # that files landed proves copying works; this proves the setup works.
   ( cd "$t" && CLAUDE_PROJECT_DIR="$t" ./.claude/hooks/plan-gate.sh templates/plan.md ) >/dev/null 2>&1
